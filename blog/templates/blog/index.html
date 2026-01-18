@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Cad Bridge | Engineering Network</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts: Inter (UI) and Merriweather (Articles) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+    
+    <!-- Icons (Phosphor Icons for lightweight SVGs) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        /* Custom CSS Variables - Professional Warm Color Scheme (No Blue/Green) */
+        :root {
+            --primary-color: #7c2d12;       /* Warm burgundy */
+            --primary-dark: #5c220d;        /* Darker burgundy */
+            --primary-light: #fed7aa;       /* Light peach */
+            --secondary-color: #854d0e;     /* Golden brown */
+            --accent-color: #dc2626;        /* Crimson red */
+            --accent-light: #fee2e2;        /* Light red */
+            --text-primary: #1c1917;        /* Rich black */
+            --text-secondary: #57534e;      /* Warm gray */
+            --text-tertiary: #78716c;       /* Lighter warm gray */
+            --bg-primary: #ffffff;          /* White */
+            --bg-secondary: #fafaf9;        /* Stone background */
+            --bg-tertiary: #f5f5f4;         /* Slightly darker stone */
+            --border-color: #d6d3d1;        /* Warm border */
+            --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-dark: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background-color: #fafaf9;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d6d3d1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a29e; 
+        }
+
+        .edge-card:hover .edge-overlay {
+            background: linear-gradient(to top, rgba(0,0,0,0.85), rgba(0,0,0,0.3), transparent);
+        }
+
+        /* Custom styles for the color scheme */
+        .bg-primary {
+            background-color: var(--bg-primary);
+        }
+
+        .bg-secondary {
+            background-color: var(--bg-secondary);
+        }
+
+        .bg-tertiary {
+            background-color: var(--bg-tertiary);
+        }
+
+        .text-primary {
+            color: var(--text-primary);
+        }
+
+        .text-secondary {
+            color: var(--text-secondary);
+        }
+
+        .text-tertiary {
+            color: var(--text-tertiary);
+        }
+
+        .border-color {
+            border-color: var(--border-color);
+        }
+
+        .shadow-light {
+            box-shadow: var(--shadow-light);
+        }
+
+        .shadow-medium {
+            box-shadow: var(--shadow-medium);
+        }
+
+        .shadow-dark {
+            box-shadow: var(--shadow-dark);
+        }
+
+        /* Professional gradient backgrounds */
+        .gradient-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        }
+
+        .gradient-card {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent-light) 100%);
+        }
+
+        /* Elegant hover effects */
+        .hover-lift {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-dark);
+        }
+
+        /* Media Queries */
+        @media (max-width: 1024px) {
+            .lg\:col-span-3 {
+                grid-column: span 6;
+            }
+            
+            .lg\:col-span-6 {
+                grid-column: span 12;
+            }
+            
+            .lg\:grid-cols-2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .lg\:col-span-3 {
+                grid-column: span 12;
+            }
+            
+            .lg\:col-span-6 {
+                grid-column: span 12;
+            }
+            
+            .lg\:grid-cols-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .hidden-lg {
+                display: none;
+            }
+            
+            .flex-col-mobile {
+                flex-direction: column;
+            }
+            
+            .text-center-mobile {
+                text-align: center;
+            }
+            
+            .px-mobile {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .grid-cols-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .flex-wrap-mobile {
+                flex-wrap: wrap;
+            }
+            
+            .gap-mobile {
+                gap: 0.5rem;
+            }
+            
+            .text-sm-mobile {
+                font-size: 0.875rem;
+            }
+            
+            .p-mobile {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hidden-mobile {
+                display: none;
+            }
+            
+            .text-xs-mobile {
+                font-size: 0.75rem;
+            }
+            
+            .h-8-mobile {
+                height: 2rem;
+            }
+            
+            .w-8-mobile {
+                width: 2rem;
+            }
+            
+            .gap-1-mobile {
+                gap: 0.25rem;
+            }
+        }
+
+        /* Pagination styles */
+        .pagination-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 2.5rem;
+            min-width: 2.5rem;
+            padding: 0 0.75rem;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
+        
+        .pagination-link:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--primary-color);
+            border-color: var(--primary-light);
+        }
+        
+        .pagination-link.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .pagination-link.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: var(--bg-tertiary);
+        }
+        
+        /* Avatar initials */
+        .avatar-initials {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Navigation Bar -->
+    <nav class="bg-white border-b border-[#d6d3d1] sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center gap-4">
+                    <!-- Logo -->
+                    <a href="#" class="flex items-center gap-3">
+                        <div class="bg-[#7c2d12] text-white p-2 rounded-lg">
+                            <i class="ph-bold ph-circuitry text-2xl"></i>
+                        </div>
+                        <div>
+                            <span class="font-bold text-xl text-[#1c1917] tracking-tight hidden md:block">E-Cad<span class="font-light text-[#dc2626]">Bridge</span></span>
+                            <span class="block text-[10px] text-[#78716c] -mt-1 hidden md:block">Engineering Network</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Authentication Block -->
+                <div class="flex items-center gap-4">
+                    {% if user.is_authenticated %}
+                        <!-- Logged-in User Header -->
+                        <div class="user-menu flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-[#f5f5f4] transition-colors">
+                            <div class="avatar-initials">
+                                {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-sm text-[#57534e] font-medium">
+                                    Hi, {{ user.first_name|default:user.username }}
+                                </span>
+                                <div class="flex gap-2 mt-1">
+                                    {% if user.is_staff %}
+                                        <a href="{% url 'blog:admin_content_list' %}" class="text-xs text-[#7c2d12] hover:underline">
+                                            Dashboard
+                                        </a>
+                                    {% endif %}
+                                    <a href="{% url 'blog:logout' %}" class="text-xs text-[#dc2626] hover:underline">
+                                        Logout
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- Guest Header -->
+                        <a href="{% url 'blog:login' %}" class="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-[#f5f5f4] transition-colors">
+                            <i class="ph-fill ph-user-circle text-xl text-[#57534e]"></i>
+                            <span class="text-sm text-[#57534e] hidden md:block">Login</span>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Layout Grid -->
+    <div class="max-w-7xl mx-auto px-0 sm:px-4 lg:px-8 py-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left Sidebar (Profile & Stats) -->
+            <aside class="hidden lg:block lg:col-span-3 space-y-4">
+                <!-- User Card -->
+                <div class="bg-white rounded-lg shadow-sm border border-[#d6d3d1] overflow-hidden relative hover-lift">
+                    <div class="h-16 gradient-header"></div>
+                    <div class="px-4 pb-4 text-center">
+                        {% if user.is_authenticated %}
+                            <div class="avatar-initials mx-auto -mt-8" style="width: 64px; height: 64px; font-size: 20px;">
+                                {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                            </div>
+                            <h2 class="mt-2 text-lg font-semibold text-[#1c1917]">
+                                {{ user.first_name }} {{ user.last_name }}
+                            </h2>
+                            {% if user.userprofile.designation %}
+                                <p class="text-xs text-[#57534e]">{{ user.userprofile.designation }}</p>
+                            {% endif %}
+                        {% else %}
+                            <div class="avatar-initials mx-auto -mt-8" style="width: 64px; height: 64px; font-size: 20px; background-color: #78716c;">
+                                V
+                            </div>
+                            <h2 class="mt-2 text-lg font-semibold text-[#1c1917]">Visitor</h2>
+                            <p class="text-xs text-[#57534e]">Sign in to access all features</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Advertisement Space (Vertical) -->
+                <div class="bg-white rounded-lg shadow-sm border border-[#d6d3d1] p-2 hover-lift">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-[10px] font-semibold text-[#78716c]">Advertisement</span>
+                        <i class="ph ph-dots-three text-[#78716c]"></i>
+                    </div>
+                    <div class="gradient-card rounded border border-[#d6d3d1] h-48 flex flex-col items-center justify-center text-center p-4">
+                        <i class="ph-duotone ph-cpu text-4xl text-[#7c2d12] mb-2"></i>
+                        <p class="text-sm font-medium text-[#57534e]">Upgrade to Altium Designer 24</p>
+                        <button class="mt-3 px-4 py-1.5 bg-[#7c2d12] text-white rounded-full text-xs font-semibold hover:bg-[#5c220d] transition-colors">Learn More</button>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="bg-white rounded-lg shadow-sm border border-[#d6d3d1] p-4 hover-lift">
+                    <h3 class="text-sm font-semibold text-[#1c1917] mb-3">Platform Stats</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-[#57534e]">Total Articles</span>
+                            <span class="text-sm font-semibold text-[#7c2d12]">{{ articles|length }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-[#57534e]">Total Posts</span>
+                            <span class="text-sm font-semibold text-[#7c2d12]">{{ posts|length }}</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Center Column (Articles Feed) -->
+            <main class="col-span-1 lg:col-span-6">
+                <div class="mb-6">
+                    <h1 class="text-2xl font-bold text-[#1c1917] mb-2">Latest Articles</h1>
+                    <p class="text-sm text-[#57534e]">Technical insights and engineering knowledge</p>
+                </div>
+
+                <!-- Articles List -->
+                <div class="space-y-4">
+                    {% for article in articles_page %}
+                        <div class="bg-white rounded-lg shadow-sm border border-[#d6d3d1] overflow-hidden hover-lift">
+                            {% if article.cover_image %}
+                                <div class="relative h-48 w-full overflow-hidden">
+                                    <img src="{{ article.formatted_image_url }}" 
+                                         alt="{{ article.title }}" 
+                                         class="w-full h-full object-cover">
+                                    <div class="absolute top-3 left-3">
+                                        <span class="inline-block px-2 py-1 bg-[#7c2d12] text-white text-xs font-bold rounded">
+                                            Article
+                                        </span>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center gap-2">
+                                        <div class="avatar-initials">
+                                            {{ article.author.user.first_name|first|upper }}{{ article.author.user.last_name|first|upper }}
+                                        </div>
+                                        <div>
+                                            <p class="text-xs font-medium text-[#1c1917]">
+                                                {{ article.author.username }}
+                                            </p>
+                                            {% if article.author.designation %}
+                                                <p class="text-[10px] text-[#57534e]">{{ article.author.designation }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <span class="text-xs text-[#78716c]">{{ article.created_at|date:"M d, Y" }}</span>
+                                </div>
+                                
+                                <h3 class="text-lg font-bold text-[#1c1917] mb-2 hover:text-[#7c2d12]">
+                                    <a href="{% url 'blog:articles' %}">
+                                        {{ article.title }}
+                                    </a>
+                                </h3>
+                                
+                                <div class="flex items-center justify-between mt-4 pt-3 border-t border-[#d6d3d1]">
+                                    <div class="flex items-center gap-1 text-xs text-[#57534e]">
+                                        <i class="ph ph-eye"></i>
+                                        <span>{{ article.views }} views</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="bg-white rounded-lg shadow-sm border border-[#d6d3d1] p-8 text-center">
+                            <i class="ph ph-article text-4xl text-[#78716c] mb-3"></i>
+                            <h3 class="text-lg font-semibold text-[#1c1917] mb-2">No Articles Yet</h3>
+                            <p class="text-sm text-[#57534e]">Check back soon for new technical articles</p>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination for Articles -->
+                {% if articles_page.has_other_pages %}
+                    <div class="mt-8 flex justify-center">
+                        <nav class="flex items-center gap-1">
+                            {% if articles_page.has_previous %}
+                                <a href="?page={{ articles_page.previous_page_number }}" class="pagination-link">
+                                    <i class="ph ph-caret-left"></i>
+                                </a>
+                            {% else %}
+                                <span class="pagination-link disabled">
+                                    <i class="ph ph-caret-left"></i>
+                                </span>
+                            {% endif %}
+                            
+                            {% for num in articles_page.paginator.page_range %}
+                                {% if articles_page.number == num %}
+                                    <span class="pagination-link active">{{ num }}</span>
+                                {% elif num > articles_page.number|add:'-3' and num < articles_page.number|add:'3' %}
+                                    <a href="?page={{ num }}" class="pagination-link">{{ num }}</a>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if articles_page.has_next %}
+                                <a href="?page={{ articles_page.next_page_number }}" class="pagination-link">
+                                    <i class="ph ph-caret-right"></i>
+                                </a>
+                            {% else %}
+                                <span class="pagination-link disabled">
+                                    <i class="ph ph-caret-right"></i>
+                                </span>
+                            {% endif %}
+                        </nav>
+                    </div>
+                {% endif %}
+            </main>
+
+            <!-- Right Sidebar (Posts) -->
+            <aside class="col-span-1 lg:col-span-3 space-y-4">
+                <div class="flex items-center justify-between mb-2 px-2">
+                    <h3 class="text-sm font-bold text-[#1c1917]">Trending Posts</h3>
+                    <i class="ph-fill ph-info text-[#78716c]"></i>
+                </div>
+
+                <!-- Posts List -->
+                <div class="grid grid-cols-2 lg:grid-cols-1 gap-3">
+                    {% for post in posts_page %}
+                        <div class="group edge-card relative h-40 w-full rounded-xl overflow-hidden cursor-pointer shadow-sm hover:shadow-lg transition-all duration-300">
+                            {% if post.cover_image %}
+                                <img src="{{ post.formatted_image_url }}" 
+                                     alt="{{ post.title }}" 
+                                     class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            {% else %}
+                                <div class="absolute inset-0 bg-gradient-to-r from-[#fed7aa] to-[#fee2e2]"></div>
+                            {% endif %}
+                            
+                            <!-- Gradient Overlay (Edge Style) -->
+                            <div class="edge-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-all duration-300"></div>
+
+                            <!-- Content -->
+                            <div class="absolute bottom-0 left-0 p-3 w-full z-10">
+                                <span class="inline-block px-1.5 py-0.5 bg-[#7c2d12] text-[9px] font-bold text-white rounded mb-1 uppercase tracking-wide shadow-sm">
+                                    Post
+                                </span>
+                                <h4 class="text-sm font-bold text-white leading-tight drop-shadow-sm line-clamp-2 mb-1 group-hover:text-orange-100 transition-colors">
+                                    <a href="{% url 'blog:posts' %}" class="text-white hover:text-orange-100">
+                                        {{ post.title }}
+                                    </a>
+                                </h4>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[10px] text-gray-300 font-medium">
+                                        {{ post.created_at|timesince }} ago
+                                    </span>
+                                    <i class="ph-bold ph-arrow-right text-white opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-10px] group-hover:translate-x-0"></i>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <!-- Advertisement 1 (When no posts) -->
+                        <div class="bg-white p-3 rounded-lg border border-[#d6d3d1] shadow-sm relative overflow-hidden group cursor-pointer hover-lift">
+                            <div class="absolute inset-0 bg-gradient-to-r from-orange-50 to-stone-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <p class="text-[10px] text-[#78716c] mb-1 z-10 relative">Sponsored</p>
+                            <div class="flex items-start gap-3 z-10 relative">
+                                <div class="w-16 h-16 bg-orange-100 rounded-md flex items-center justify-center flex-shrink-0">
+                                    <i class="ph-duotone ph-aperture text-2xl text-[#7c2d12]"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-bold text-[#1c1917] leading-snug">New Lens Technology for Optical Sensors</p>
+                                    <p class="text-[10px] text-[#57534e] mt-1">Visit OpticsLab</p>
+                                    <button class="mt-2 text-[10px] bg-[#7c2d12] text-white px-2 py-0.5 rounded hover:bg-[#5c220d]">Follow</button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    <!-- Advertisement 2 -->
+                    <div class="bg-white p-3 rounded-lg border border-[#d6d3d1] shadow-sm relative overflow-hidden group cursor-pointer hover-lift">
+                        <div class="absolute inset-0 bg-gradient-to-r from-orange-50 to-stone-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <p class="text-[10px] text-[#78716c] mb-1 z-10 relative">Sponsored</p>
+                        <div class="flex items-start gap-3 z-10 relative">
+                            <div class="w-16 h-16 bg-orange-100 rounded-md flex items-center justify-center flex-shrink-0">
+                                <i class="ph-duotone ph-cpu text-2xl text-[#7c2d12]"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-[#1c1917] leading-snug">Advanced Thermal Analysis Software</p>
+                                <p class="text-[10px] text-[#57534e] mt-1">Ansys 2026 Release</p>
+                                <button class="mt-2 text-[10px] bg-[#7c2d12] text-white px-2 py-0.5 rounded hover:bg-[#5c220d]">Learn More</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination for Posts -->
+                {% if posts_page.has_other_pages %}
+                    <div class="mt-4">
+                        <nav class="flex items-center justify-center gap-1">
+                            {% if posts_page.has_previous %}
+                                <a href="?post_page={{ posts_page.previous_page_number }}" class="pagination-link text-xs">
+                                    <i class="ph ph-caret-left"></i>
+                                </a>
+                            {% endif %}
+                            
+                            <span class="text-xs text-[#57534e] px-2">
+                                Page {{ posts_page.number }} of {{ posts_page.paginator.num_pages }}
+                            </span>
+                            
+                            {% if posts_page.has_next %}
+                                <a href="?post_page={{ posts_page.next_page_number }}" class="pagination-link text-xs">
+                                    <i class="ph ph-caret-right"></i>
+                                </a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                {% endif %}
+
+                <!-- Footer Links -->
+                <div class="text-center mt-6 pt-4 border-t border-[#d6d3d1]">
+                    <div class="flex flex-wrap justify-center gap-x-4 gap-y-1 text-[11px] text-[#57534e]">
+                        <a href="#" class="hover:text-[#7c2d12] hover:underline">About</a>
+                        <a href="#" class="hover:text-[#7c2d12] hover:underline">Accessibility</a>
+                        <a href="#" class="hover:text-[#7c2d12] hover:underline">Help Center</a>
+                        <a href="#" class="hover:text-[#7c2d12] hover:underline">Privacy & Terms</a>
+                        <a href="#" class="hover:text-[#7c2d12] hover:underline">Ad Choices</a>
+                    </div>
+                    <div class="mt-2 text-[11px] text-[#1c1917]">
+                        E-Cad Bridge Corporation © 2026
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-[#d6d3d1] py-8 mt-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <div class="bg-[#7c2d12] text-white p-2 rounded-lg">
+                            <i class="ph-bold ph-circuitry text-2xl"></i>
+                        </div>
+                        <div>
+                            <span class="font-bold text-xl text-[#1c1917] tracking-tight">E-Cad<span class="font-light text-[#dc2626]">Bridge</span></span>
+                            <p class="text-xs text-[#57534e] mt-1">Engineering Design Community</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-[#57534e]">
+                        Connecting E-CAD engineers worldwide. Share knowledge, discuss challenges, and advance electronic design automation together.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-[#78716c] hover:text-[#7c2d12]">
+                            <i class="ph-fill ph-twitter-logo text-xl"></i>
+                        </a>
+                        <a href="#" class="text-[#78716c] hover:text-[#7c2d12]">
+                            <i class="ph-fill ph-linkedin-logo text-xl"></i>
+                        </a>
+                        <a href="#" class="text-[#78716c] hover:text-[#7c2d12]">
+                            <i class="ph-fill ph-github-logo text-xl"></i>
+                        </a>
+                        <a href="#" class="text-[#78716c] hover:text-[#7c2d12]">
+                            <i class="ph-fill ph-youtube-logo text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold text-[#1c1917] mb-4">Content</h3>
+                    <ul class="space-y-2">
+                        <li><a href="{% url 'blog:articles' %}" class="text-sm text-[#57534e] hover:text-[#7c2d12]">Articles</a></li>
+                        <li><a href="{% url 'blog:posts' %}" class="text-sm text-[#57534e] hover:text-[#7c2d12]">Posts</a></li>
+                        <li><a href="#" class="text-sm text-[#57534e] hover:text-[#7c2d12]">Tutorials</a></li>
+                        <li><a href="#" class="text-sm text-[#57534e] hover:text-[#7c2d12]">Case Studies</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold text-[#1c1917] mb-4">Company</h3>
+                    <ul class="space-y-2">
+                        <li><a href="{% url 'blog:about' %}" class="text-sm text-[#57534e] hover:text-[#7c2d12]">About Us</a></li>
+                        <li><a href="{% url 'blog:contact' %}" class="text-sm text-[#57534e] hover:text-[#7c2d12]">Contact</a></li>
+                        <li><a href="#" class="text-sm text-[#57534e] hover:text-[#7c2d12]">Careers</a></li>
+                        <li><a href="{% url 'blog:tc' %}" class="text-sm text-[#57534e] hover:text-[#7c2d12]">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-[#d6d3d1] mt-8 pt-8 text-center">
+                <p class="text-sm text-[#57534e]">
+                    &copy; 2026 E-Cad Bridge. All rights reserved. | For Electronics Design Professionals
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Simple hover effect for post cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const postCards = document.querySelectorAll('.edge-card');
+            
+            postCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    const img = this.querySelector('img');
+                    if (img) {
+                        img.style.transform = 'scale(1.1)';
+                    }
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    const img = this.querySelector('img');
+                    if (img) {
+                        img.style.transform = 'scale(1.05)';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

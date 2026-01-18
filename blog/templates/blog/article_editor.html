@@ -1,0 +1,3307 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>{% if is_edit %}Edit {{ content.title|default:"Content" }}{% else %}Write Article{% endif %} | ECAD Bridge</title>
+  
+  <!-- TinyMCE -->
+  <script src="{% static 'tinymce/tinymce.min.js' %}"></script>
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Prism.js for line numbers and copy button only -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css">
+  
+  <!-- MathJax Configuration -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      showProcessingMessages: false,
+      messageStyle: "none",
+      showMathMenu: true,
+      showMathMenuMSIE: true,
+      menuSettings: {
+        context: "MathJax",
+        zoom: "Click"
+      },
+      extensions: ["tex2jax.js"],
+      jax: ["input/TeX", "output/HTML-CSS"],
+      TeX: {
+        extensions: ["AMSmath.js", "AMSsymbols.js", "noErrors.js", "noUndefined.js"]
+      }
+    });
+  </script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_HTML"></script>
+  
+  <style>
+    :root {
+      --primary-color: #0a66c2;
+      --primary-hover: #004182;
+      --primary-light: rgba(10, 102, 194, 0.1);
+      --text-primary: #000000e6;
+      --text-secondary: #00000099;
+      --text-tertiary: #00000066;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f9fafb;
+      --bg-tertiary: #eef3f8;
+      --border-color: #d0d8e0;
+      --border-light: #e6e9ec;
+      --shadow-light: 0 1px 2px rgba(0, 0, 0, 0.08);
+      --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.12);
+      --shadow-heavy: 0 8px 24px rgba(0, 0, 0, 0.15);
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-smooth: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-bounce: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+      --font-primary: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Monaco, 'Cascadia Mono', monospace;
+      
+      /* Code Block Colors */
+      --code-bg: #2d2d2d;
+      --code-header-bg: #1e1e1e;
+      --code-border: #404040;
+      --code-green: #7ec699;
+      --code-yellow: #e8bf6a;
+      --code-purple: #c594c5;
+      --code-blue: #6699cc;
+      --code-red: #f2777a;
+      --code-orange: #f99157;
+      --code-gray: #999999;
+      --code-text: #f8f8f2;
+      --code-light-gray: #cccccc;
+      
+      /* Math Equation Colors */
+      --math-bg: #f8f9fa;
+      --math-border: #e9ecef;
+      --math-header-bg: #e9ecef;
+      --math-text: #2c3e50;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-primary);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.5;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Header */
+    .site-header {
+      padding: 12px 0;
+      background-color: var(--bg-primary);
+      border-bottom: 1px solid var(--border-light);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: var(--shadow-light);
+      backdrop-filter: blur(10px);
+      background-color: rgba(255, 255, 255, 0.95);
+    }
+
+    .container {
+      max-width: 1128px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary-color);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      text-decoration: none;
+      transition: transform var(--transition-fast);
+    }
+
+    .logo:hover {
+      transform: translateY(-1px);
+    }
+
+    .logo span {
+      color: var(--text-primary);
+    }
+
+    .logo::before {
+      content: "📝";
+      font-size: 24px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .save-status {
+      font-size: 14px;
+      color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-md);
+      transition: all var(--transition-fast);
+    }
+
+    .save-status:hover {
+      background: var(--border-light);
+    }
+
+    .save-status i {
+      font-size: 12px;
+    }
+
+    /* Main Editor Content */
+    .main-content {
+      padding: 32px 0 80px;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .editor-container {
+      max-width: 752px;
+      margin: 0 auto;
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      text-align: center;
+      margin-bottom: 48px;
+      padding: 0 24px;
+    }
+
+    .hero-banner h1 {
+      font-size: 40px;
+      font-weight: 200;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+      animation: slideUp 0.6s ease-out 0.1s both;
+    }
+
+    .hero-banner p {
+      font-size: 20px;
+      color: var(--text-secondary);
+      font-weight: 300;
+      animation: slideUp 0.6s ease-out 0.2s both;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Editor Box */
+    .editor-box {
+      background: var(--bg-primary);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-light);
+      overflow: hidden;
+      box-shadow: var(--shadow-light);
+      transition: box-shadow var(--transition-smooth);
+    }
+
+    .editor-box:hover {
+      box-shadow: var(--shadow-medium);
+    }
+
+    .editor-header {
+      padding: 32px 32px 0;
+      border-bottom: 1px solid var(--border-light);
+      background: var(--bg-secondary);
+    }
+
+    /* Cover Image Section - IMPROVED LAYOUT */
+    .cover-image-section {
+      padding: 32px;
+      border-bottom: 1px solid var(--border-light);
+      background: var(--bg-secondary);
+      position: relative;
+    }
+
+    .cover-image-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .cover-image-label-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .cover-image-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--bg-primary);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+    }
+
+    .cover-image-label i {
+      color: var(--primary-color);
+    }
+
+    /* Post/Article Toggle - IMPROVED DESIGN */
+    .post-type-toggle {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .toggle-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 140px;
+      height: 44px;
+    }
+
+    .toggle-checkbox {
+      display: none;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--bg-primary);
+      border: 2px solid var(--border-color);
+      border-radius: 24px;
+      transition: all var(--transition-bounce);
+      overflow: hidden;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 36px;
+      width: 70px;
+      left: 4px;
+      bottom: 3px;
+      background-color: var(--primary-color);
+      border-radius: 20px;
+      transition: all var(--transition-bounce);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 13px;
+      z-index: 2;
+      box-shadow: 0 2px 8px rgba(10, 102, 194, 0.3);
+    }
+
+    .toggle-checkbox:checked + .toggle-slider {
+      background-color: var(--bg-primary);
+      border-color: var(--primary-color);
+    }
+
+    .toggle-checkbox:checked + .toggle-slider:before {
+      transform: translateX(62px);
+      content: "Article";
+      background-color: var(--primary-color);
+    }
+
+    .toggle-checkbox:not(:checked) + .toggle-slider:before {
+      content: "Post";
+    }
+
+    .toggle-text {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      z-index: 1;
+      transition: all var(--transition-smooth);
+      pointer-events: none;
+    }
+
+    .toggle-text.post {
+      left: 20px;
+      color: white;
+    }
+
+    .toggle-text.article {
+      right: 16px;
+      color: var(--text-secondary);
+    }
+
+    .toggle-checkbox:checked + .toggle-slider + .toggle-text.post {
+      color: var(--text-secondary);
+    }
+
+    .toggle-checkbox:checked + .toggle-slider + .toggle-text.article {
+      color: white;
+    }
+
+    .toggle-checkbox:checked + .toggle-slider + .toggle-text.post + .toggle-text.article {
+      color: white;
+    }
+
+    .toggle-checkbox:not(:checked) + .toggle-slider + .toggle-text.post + .toggle-text.article {
+      color: var(--text-secondary);
+    }
+
+    /* Hover effects for toggle */
+    .toggle-slider:hover {
+      border-color: var(--primary-color);
+      transform: translateY(-1px);
+    }
+
+    /* Cover Image Container */
+    .cover-image-container {
+      max-width: 100%;
+    }
+
+    .cover-image-upload {
+      position: relative;
+      border: 2px dashed var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 40px 24px;
+      text-align: center;
+      background: var(--bg-primary);
+      cursor: pointer;
+      transition: all var(--transition-bounce);
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      overflow: hidden;
+    }
+
+    .cover-image-upload:hover {
+      border-color: var(--primary-color);
+      background: var(--primary-light);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
+    }
+
+    .cover-image-upload.has-image {
+      border-style: solid;
+      border-color: var(--primary-color);
+      padding: 0;
+      min-height = 0;
+      display: block;
+      height: auto;
+    }
+
+    .cover-image-preview {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: var(--radius-sm);
+      display: none;
+      max-height: 400px;
+      background: var(--bg-tertiary);
+    }
+
+    .cover-image-preview.visible {
+      display: block;
+      animation: fadeInScale 0.4s ease-out;
+    }
+
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .upload-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      transition: transform var(--transition-smooth);
+    }
+
+    .cover-image-upload:hover .upload-placeholder {
+      transform: translateY(-2px);
+    }
+
+    .upload-placeholder i {
+      font-size: 48px;
+      color: var(--primary-color);
+      transition: transform var(--transition-bounce);
+    }
+
+    .cover-image-upload:hover .upload-placeholder i {
+      transform: scale(1.1);
+    }
+
+    .upload-placeholder h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .upload-placeholder p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      max-width: 300px;
+    }
+
+    .cover-image-input {
+      display: none;
+    }
+
+    .image-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    .image-action-btn {
+      padding: 8px 20px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition-bounce);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .image-action-btn:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-light);
+    }
+
+    .image-action-btn.remove:hover {
+      background: #fee;
+      border-color: #faa;
+      color: #d32f2f;
+      box-shadow: 0 2px 8px rgba(211, 47, 47, 0.2);
+    }
+
+    .image-action-btn.change:hover {
+      background: var(--primary-light);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .title-input-container {
+      position: relative;
+      margin-bottom: 32px;
+    }
+
+    .title-label {
+      position: absolute;
+      top: 24px;
+      left: 0;
+      font-size: 56px;
+      font-weight: 300;
+      color: var(--text-tertiary);
+      pointer-events: none;
+      transition: all var(--transition-smooth);
+      line-height: 1.2;
+      letter-spacing: -1px;
+      opacity: 0.5;
+    }
+
+    .title-input {
+      width: 100%;
+      padding: 0;
+      font-size: 56px;
+      font-weight: 300;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--text-primary);
+      line-height: 1.2;
+      letter-spacing: -1px;
+      min-height: 68px;
+      font-family: var(--font-primary);
+      resize: none;
+      overflow: hidden;
+      transition: all var(--transition-fast);
+    }
+
+    .title-input::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .title-input:focus {
+      color: var(--primary-color);
+    }
+
+    .title-input:focus + .title-label,
+    .title-input:not(:placeholder-shown) + .title-label {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+
+    .editor-body {
+      padding: 32px;
+    }
+
+    /* Rich Text Editor Container */
+    .rich-editor-container {
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--bg-primary);
+      margin-bottom: 24px;
+      transition: border-color var(--transition-smooth);
+    }
+
+    .rich-editor-container:focus-within {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    /* Toolbar Styling */
+    .tox-toolbar__primary {
+      background: var(--bg-secondary) !important;
+      border-bottom: 1px solid var(--border-light) !important;
+      padding: 8px 12px !important;
+      transition: border-color var(--transition-smooth);
+    }
+
+    .rich-editor-container:focus-within .tox-toolbar__primary {
+      border-bottom-color: var(--primary-color) !important;
+    }
+
+    .tox-toolbar__group {
+      padding: 0 8px !important;
+    }
+
+    .tox-tbtn {
+      border-radius: var(--radius-sm) !important;
+      margin: 2px !important;
+      transition: all var(--transition-fast) !important;
+    }
+
+    .tox-tbtn:hover {
+      background-color: var(--bg-tertiary) !important;
+      transform: translateY(-1px);
+    }
+
+    .tox-tbtn--enabled {
+      background-color: var(--primary-color) !important;
+      color: white !important;
+      box-shadow: 0 2px 4px rgba(10, 102, 194, 0.2);
+    }
+
+    .tox-edit-area {
+      border: none !important;
+    }
+
+    /* Math Equation Block Styles */
+    .math-equation-wrapper {
+      position: relative;
+      margin: 24px 0;
+      border: 1px solid var(--math-border);
+      border-radius: var(--radius-md);
+      background: var(--math-bg);
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-bounce);
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .math-equation-wrapper:hover {
+      border-color: var(--primary-color);
+      box-shadow: var(--shadow-light);
+      transform: translateY(-2px);
+    }
+
+    .math-equation-wrapper.inline {
+      display: inline-block;
+      margin: 0 4px;
+      padding: 8px 16px;
+      min-height: 0;
+      vertical-align: middle;
+    }
+
+    .math-equation-content {
+      width: 100%;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .math-equation-content .MathJax {
+      outline: none !important;
+    }
+
+    .math-equation-placeholder {
+      color: var(--text-tertiary);
+      font-style: italic;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .math-equation-placeholder i {
+      font-size: 16px;
+    }
+
+    .math-equation-actions {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+      transition: all var(--transition-smooth);
+      transform: translateY(-5px);
+    }
+
+    .math-equation-wrapper:hover .math-equation-actions {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .math-equation-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      background: white;
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-secondary);
+      transition: all var(--transition-bounce);
+    }
+
+    .math-equation-btn:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-light);
+    }
+
+    .math-equation-btn.edit:hover {
+      color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    .math-equation-btn.remove:hover {
+      color: #d32f2f;
+      border-color: #faa;
+      background: #fee;
+    }
+
+    /* MathJax Menu Customization */
+    .MathJax_Menu {
+      z-index: 2001 !important;
+      border-radius: var(--radius-md) !important;
+      box-shadow: var(--shadow-heavy) !important;
+      border: 1px solid var(--border-color) !important;
+      font-family: var(--font-primary) !important;
+    }
+
+    .MathJax_Menu .MathJax_MenuItem {
+      padding: 8px 20px !important;
+      font-size: 14px !important;
+      color: var(--text-primary) !important;
+      transition: all var(--transition-fast) !important;
+    }
+
+    .MathJax_Menu .MathJax_MenuItem:hover {
+      background: var(--bg-tertiary) !important;
+      color: var(--primary-color) !important;
+    }
+
+    /* Form Actions */
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .btn {
+      padding: 10px 24px;
+      border-radius: 24px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all var(--transition-bounce);
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 5px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.5);
+      opacity: 0;
+      border-radius: 100%;
+      transform: scale(1, 1) translate(-50%);
+      transform-origin: 50% 50%;
+    }
+
+    .btn:focus:not(:active)::after {
+      animation: ripple 1s ease-out;
+    }
+
+    @keyframes ripple {
+      0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+      }
+      100% {
+        transform: scale(40, 40);
+        opacity: 0;
+      }
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+      box-shadow: 0 2px 8px rgba(10, 102, 194, 0.3);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--primary-hover);
+      border-color: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--text-secondary);
+      border-color: var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--bg-tertiary);
+      border-color: var(--text-tertiary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-light);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    /* Tips Section */
+    .editor-tips {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-top: 32px;
+      transition: all var(--transition-smooth);
+    }
+
+    .editor-tips:hover {
+      box-shadow: var(--shadow-light);
+      transform: translateY(-2px);
+    }
+
+    .editor-tips h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .editor-tips ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .editor-tips li {
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      transition: color var(--transition-fast);
+    }
+
+    .editor-tips li:hover {
+      color: var(--text-primary);
+    }
+
+    .editor-tips li:before {
+      content: "•";
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+
+    /* Character Count */
+    .char-count {
+      text-align: right;
+      font-size: 14px;
+      color: var(--text-tertiary);
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-md);
+      transition: all var(--transition-fast);
+    }
+
+    .char-count:hover {
+      background: var(--border-light);
+    }
+
+    .char-count i {
+      font-size: 12px;
+    }
+
+    /* Code Block Styles */
+    .code-block-wrapper {
+      position: relative;
+      margin: 24px 0;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-medium);
+      border: 1px solid var(--code-border);
+      transition: all var(--transition-smooth);
+    }
+
+    .code-block-wrapper:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-heavy);
+    }
+
+    .code-header {
+      background: var(--code-header-bg);
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--code-border);
+      transition: background var(--transition-fast);
+    }
+
+    .code-language {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--code-light-gray);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .code-language i {
+      color: var(--code-green);
+    }
+
+    .code-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .code-btn {
+      background: transparent;
+      border: 1px solid var(--code-border);
+      color: var(--code-light-gray);
+      padding: 4px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-family: var(--font-mono);
+      cursor: pointer;
+      transition: all var(--transition-bounce);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .code-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    .code-btn.copy-btn:hover {
+      color: var(--code-green);
+      border-color: var(--code-green);
+      box-shadow: 0 2px 8px rgba(126, 198, 153, 0.3);
+    }
+
+    .code-content {
+      background: var(--code-bg);
+      margin: 0;
+      padding: 16px;
+      overflow-x: auto;
+      position: relative;
+    }
+
+    .code-content pre {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 15px;
+      line-height: 1.6;
+      tab-size: 4;
+      color: var(--code-text);
+    }
+
+    .code-content code {
+      font-family: inherit;
+      background: transparent;
+      padding: 0;
+      color: var(--code-text);
+    }
+
+    /* Line Numbers */
+    .line-numbers {
+      position: absolute;
+      left: 0;
+      top: 0;
+      padding: 16px 8px;
+      background: var(--code-header-bg);
+      color: var(--code-gray);
+      text-align: right;
+      font-family: var(--font-mono);
+      font-size: 15px;
+      line-height: 1.6;
+      border-right: 1px solid var(--code-border);
+      user-select: none;
+    }
+
+    .line-number {
+      display: block;
+      padding-right: 8px;
+    }
+
+    /* Code Insert Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      backdrop-filter: blur(4px);
+      padding: 20px;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .code-modal,
+    .math-modal {
+      background: var(--bg-primary);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 700px;
+      max-height: 90vh;
+      overflow: hidden;
+      box-shadow: var(--shadow-heavy);
+      animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .math-modal {
+      max-width: 600px;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-secondary);
+      flex-shrink: 0;
+    }
+
+    .modal-header h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-header h3 i {
+      color: var(--primary-color);
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all var(--transition-bounce);
+      flex-shrink: 0;
+    }
+
+    .close-modal:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      transform: rotate(90deg);
+    }
+
+    .modal-body {
+      padding: 24px;
+      overflow: hidden;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 24px;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .math-modal-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      height: 100%;
+    }
+
+    /* Equation type selector */
+    .equation-type-selector {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .equation-type-label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .equation-type-options {
+      display: flex;
+      gap: 12px;
+    }
+
+    .equation-type-option {
+      flex: 1;
+      border: 2px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-bounce);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .equation-type-option:hover {
+      border-color: var(--primary-color);
+      background: var(--bg-tertiary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-light);
+    }
+
+    .equation-type-option.active {
+      border-color: var(--primary-color);
+      background: var(--primary-light);
+      transform: translateY(-2px);
+    }
+
+    .equation-type-option i {
+      font-size: 24px;
+      color: var(--primary-color);
+    }
+
+    .equation-type-option h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .equation-type-option p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    /* Math editor section */
+    .math-editor-section {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .math-editor-label {
+      font-weight: 600;
+      display: block;
+    }
+
+    .math-preview-container {
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      background: var(--math-bg);
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-x: auto;
+      overflow-y: hidden;
+      transition: border-color var(--transition-fast);
+    }
+
+    .math-preview-container:focus-within {
+      border-color: var(--primary-color);
+    }
+
+    .math-preview {
+      font-size: 18px;
+      color: var(--math-text);
+      text-align: center;
+      width: 100%;
+      overflow-x: auto;
+      padding: 10px;
+    }
+
+    .math-textarea {
+      font-family: var(--font-mono);
+      padding: 16px;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      resize: none;
+      font-size: 15px;
+      line-height: 1.6;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      min-height: 120px;
+      transition: all var(--transition-fast);
+    }
+
+    .math-textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.1);
+      background: var(--bg-primary);
+    }
+
+    .latex-examples {
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-top: 8px;
+      transition: background var(--transition-fast);
+    }
+
+    .latex-examples:hover {
+      background: var(--border-light);
+    }
+
+    .latex-examples h5 {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .latex-examples code {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      background: var(--bg-primary);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 6px;
+      color: var(--text-primary);
+      border: 1px solid var(--border-light);
+      cursor: pointer;
+      transition: all var(--transition-bounce);
+    }
+
+    .latex-examples code:hover {
+      background: var(--bg-secondary);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+      transform: translateX(4px);
+    }
+
+    /* Language selector */
+    .language-selector {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .language-selector label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: block;
+      flex-shrink: 0;
+    }
+
+    .language-list {
+      list-style: none;
+      overflow-y: auto;
+      flex: 1;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      min-height: 0;
+      position: relative;
+    }
+
+    /* Custom scrollbar for language list */
+    .language-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .language-list::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+      border-radius: 3px;
+    }
+
+    .language-list::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 3px;
+    }
+
+    .language-list::-webkit-scrollbar-thumb:hover {
+      background: var(--text-tertiary);
+    }
+
+    .language-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border-light);
+      transition: all var(--transition-bounce);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .language-item:hover {
+      background: var(--bg-tertiary);
+      transform: translateX(4px);
+    }
+
+    .language-item.active {
+      background: var(--primary-color);
+      color: white;
+      border-left: 4px solid var(--primary-hover);
+      transform: translateX(4px);
+    }
+
+    .language-item.active:hover {
+      background: var(--primary-hover);
+    }
+
+    .language-item i {
+      width: 20px;
+      text-align: center;
+    }
+
+    /* Code editor section */
+    .code-editor-section {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .code-editor-section label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: block;
+      flex-shrink: 0;
+    }
+
+    .code-textarea {
+      flex: 1;
+      font-family: var(--font-mono);
+      padding: 16px;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      resize: none;
+      font-size: 15px;
+      line-height: 1.6;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      tab-size: 4;
+      min-height: 0;
+      overflow-y: auto;
+      transition: all var(--transition-fast);
+    }
+
+    .code-textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.1);
+      background: var(--bg-primary);
+    }
+
+    .code-textarea::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .code-textarea::-webkit-scrollbar-track {
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+    }
+
+    .code-textarea::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+
+    .code-textarea::-webkit-scrollbar-thumb:hover {
+      background: var(--text-secondary);
+    }
+
+    .code-options {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 16px;
+      flex-shrink: 0;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      transition: background var(--transition-fast);
+    }
+
+    .checkbox-group:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--primary-color);
+    }
+
+    .checkbox-group label {
+      margin: 0;
+      font-weight: normal;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .modal-footer {
+      padding: 20px 24px;
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      background: var(--bg-secondary);
+      flex-shrink: 0;
+    }
+
+    .btn-small {
+      padding: 8px 20px;
+      font-size: 14px;
+      border-radius: 20px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 16px;
+      }
+
+      .hero-banner h1 {
+        font-size: 32px;
+      }
+
+      .hero-banner p {
+        font-size: 18px;
+      }
+
+      .title-input {
+        font-size: 40px;
+      }
+
+      .title-label {
+        font-size: 40px;
+      }
+
+      .editor-header,
+      .cover-image-section,
+      .editor-body {
+        padding: 24px;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .header-content {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .header-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .modal-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        height: auto;
+      }
+
+      .language-list {
+        max-height: 200px;
+        min-height: 200px;
+      }
+
+      .code-textarea {
+        min-height: 200px;
+      }
+
+      .modal-overlay {
+        padding: 10px;
+      }
+
+      .equation-type-options {
+        flex-direction: column;
+      }
+
+      .cover-image-preview {
+        height: 200px;
+      }
+
+      .cover-image-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 20px;
+      }
+
+      .post-type-toggle {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .toggle-switch {
+        width: 120px;
+      }
+
+      .toggle-checkbox:checked + .toggle-slider:before {
+        transform: translateX(52px);
+      }
+
+      .cover-image-label {
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .code-options,
+      .image-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+      }
+
+      .image-action-btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .toggle-switch {
+        width: 100px;
+        height: 36px;
+      }
+
+      .toggle-slider:before {
+        height: 28px;
+        width: 48px;
+      }
+
+      .toggle-checkbox:checked + .toggle-slider:before {
+        transform: translateX(42px);
+      }
+
+      .toggle-text.post {
+        left: 14px;
+      }
+
+      .toggle-text.article {
+        right: 10px;
+      }
+
+      .char-count {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+      }
+    }
+
+    /* Loading Animation */
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-spinner {
+      animation: spin 1s linear infinite;
+    }
+
+    /* Focus States */
+    .title-input:focus {
+      outline: none;
+    }
+
+    .tox-tinymce:focus-within {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--text-tertiary);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-secondary);
+    }
+
+    /* Notification styles */
+    .notification {
+      position: fixed;
+      top: 100px;
+      right: 24px;
+      background: var(--bg-primary);
+      border-left: 4px solid var(--primary-color);
+      padding: 16px 24px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-heavy);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 3000;
+      animation: slideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      max-width: 350px;
+      backdrop-filter: blur(10px);
+      background-color: rgba(255, 255, 255, 0.95);
+    }
+    
+    .notification-success {
+      border-left-color: #2e7d32;
+    }
+    
+    .notification-success i {
+      color: #2e7d32;
+    }
+    
+    .notification-warning {
+      border-left-color: #ed6c02;
+    }
+    
+    .notification-warning i {
+      color: #ed6c02;
+    }
+    
+    .notification-error {
+      border-left-color: #d32f2f;
+    }
+    
+    .notification-error i {
+      color: #d32f2f;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+
+    /* Smooth selection */
+    ::selection {
+      background-color: var(--primary-light);
+      color: var(--text-primary);
+    }
+
+    /* Smooth transitions for all interactive elements */
+    .btn, .image-action-btn, .code-btn, .math-equation-btn,
+    .toggle-switch, .cover-image-upload, .equation-type-option,
+    .language-item, .latex-examples code {
+      will-change: transform;
+    }
+
+    /* Improved focus outlines */
+    *:focus {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+    }
+
+    *:focus:not(.focus-visible) {
+      outline: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- Code Insert Modal -->
+<div class="modal-overlay" id="codeModal">
+  <div class="code-modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-code"></i> Insert Code Block</h3>
+      <button class="close-modal" id="closeCodeModal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-grid">
+        <div class="language-selector">
+          <label>Select Language</label>
+          <ul class="language-list" id="languageList">
+            <!-- Only Plain Text will be shown -->
+          </ul>
+        </div>
+        <div class="code-editor-section">
+          <label>Enter Your Code</label>
+          <textarea class="code-textarea" id="codeInput" placeholder="// Write your code here..." spellcheck="false"></textarea>
+          <div class="code-options">
+            <div class="checkbox-group">
+              <input type="checkbox" id="lineNumbers" checked>
+              <label for="lineNumbers">Show line numbers</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="showCopy" checked>
+              <label for="showCopy">Show copy button</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-small" id="cancelCode">Cancel</button>
+      <button class="btn btn-primary btn-small" id="insertCode">Insert Code</button>
+    </div>
+  </div>
+</div>
+
+<!-- Math Equation Modal -->
+<div class="modal-overlay" id="mathModal">
+  <div class="math-modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-square-root-alt"></i> Insert Mathematical Equation</h3>
+      <button class="close-modal" id="closeMathModal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="math-modal-grid">
+        <div class="equation-type-selector">
+          <label class="equation-type-label">Equation Type</label>
+          <div class="equation-type-options">
+            <div class="equation-type-option active" data-type="inline">
+              <i class="fas fa-subscript"></i>
+              <h4>Inline Equation</h4>
+              <p>Insert within text ($...$)</p>
+            </div>
+            <div class="equation-type-option" data-type="block">
+              <i class="fas fa-square-root-alt"></i>
+              <h4>Display Equation</h4>
+              <p>Centered on its own line ($$...$$)</p>
+            </div>
+          </div>
+        </div>
+        <div class="math-editor-section">
+          <label class="math-editor-label">LaTeX Equation</label>
+          <div class="math-preview-container">
+            <div class="math-preview" id="mathPreview">
+              <span class="math-equation-placeholder">
+                <i class="fas fa-calculator"></i>
+                Preview will appear here
+              </span>
+            </div>
+          </div>
+          <textarea class="math-textarea" id="mathInput" placeholder="E.g., x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}" spellcheck="false"></textarea>
+          <div class="latex-examples">
+            <h5>Quick Examples (click to insert)</h5>
+            <code onclick="insertLatexExample(this)">\frac{a}{b}</code>
+            <code onclick="insertLatexExample(this)">\sqrt{x^2 + y^2}</code>
+            <code onclick="insertLatexExample(this)">\sum_{i=1}^{n} i</code>
+            <code onclick="insertLatexExample(this)">\int_{a}^{b} f(x)dx</code>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-small" id="cancelMath">Cancel</button>
+      <button class="btn btn-primary btn-small" id="insertMath">Insert Equation</button>
+    </div>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container">
+    <div class="header-content">
+      <a href="/" class="logo">ECAD<span>Bridge</span></a>
+      <div class="header-actions">
+        <div class="save-status" id="saveStatus">
+          <i class="fas fa-save"></i>
+          <span>Saved locally</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="main-content">
+  <div class="container">
+    <div class="hero-banner">
+      <h1 id="pageTitle">{% if is_edit %}Edit Content{% else %}Share your knowledge{% endif %}</h1>
+      <p id="pageSubtitle">{% if is_edit %}Update your content{% else %}Write an article to share with your professional network{% endif %}</p>
+    </div>
+    
+    <form
+      method="POST"
+      enctype="multipart/form-data"
+      id="articleForm"
+      action="{% if is_edit %}
+                  {% url 'blog:admin_edit_content' content.pk %}
+              {% else %}
+                  {% url 'blog:create_article' %}
+              {% endif %}"
+    >
+    {% csrf_token %}
+
+    <div class="editor-container">
+      <div class="editor-box">
+
+        <!-- ================= HEADER ================= -->
+        <div class="editor-header">
+          <div class="title-input-container">
+            <textarea
+              id="titleInput"
+              class="title-input"
+              name="title"
+              placeholder="Write your title here..."
+              rows="1"
+              required
+            >{% if is_edit %}{{ content.title }}{% endif %}</textarea>
+            <div class="title-label">Write your title here...</div>
+          </div>
+        </div>
+
+        <!-- ================= BODY ================= -->
+        <div class="editor-body">
+
+          <!-- ================= COVER IMAGE + TYPE ================= -->
+          <div class="cover-image-section">
+            <div class="cover-image-header">
+              <div class="cover-image-label-container">
+                <label class="cover-image-label">
+                  <i class="fas fa-image"></i>
+                  Cover Image
+                </label>
+              </div>
+
+              <!-- Post / Article Toggle -->
+              <div class="post-type-toggle">
+                <span class="toggle-label">Type:</span>
+                <div class="toggle-switch">
+                  <input
+                    type="checkbox"
+                    id="postTypeToggle"
+                    class="toggle-checkbox"
+                    {% if is_edit and content.post_type == 'article' %}checked{% endif %}
+                  >
+                  <label for="postTypeToggle" class="toggle-slider"></label>
+                  <span class="toggle-text post">Post</span>
+                  <span class="toggle-text article">Article</span>
+                </div>
+                
+                <!-- Hidden input for post_type -->
+                <input type="hidden" name="post_type" id="postTypeInput" 
+                       value="{% if is_edit %}{{ content.post_type|default:'article' }}{% else %}article{% endif %}">
+              </div>
+            </div>
+
+            <!-- ================= COVER IMAGE ================= -->
+            <div class="cover-image-container">
+              <div class="cover-image-upload" id="coverImageUpload">
+                <input
+                  type="file"
+                  id="coverImageInput"
+                  class="cover-image-input"
+                  name="cover_image"
+                  accept="image/*"
+                >
+
+                {% if is_edit and content.cover_image %}
+                  <!-- If article has cover image (edit mode) -->
+                  <img
+                    id="coverImagePreview"
+                    class="cover-image-preview visible"
+                    src="{{ content.cover_image.url }}"
+                    alt="Cover preview"
+                  >
+                {% else %}
+                  <!-- No cover image (create mode or edit without image) -->
+                  <img
+                    id="coverImagePreview"
+                    class="cover-image-preview"
+                    src=""
+                    alt="Cover preview"
+                  >
+                {% endif %}
+
+                <div class="upload-placeholder" id="uploadPlaceholder">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                  <h4>Upload cover image</h4>
+                  <p>Drag & drop or click to browse. Recommended size: 1200×630px</p>
+                </div>
+              </div>
+
+              <div
+                class="image-actions"
+                id="imageActions"
+                style="{% if is_edit and content.cover_image %}display:flex;{% else %}display:none;{% endif %}"
+              >
+                <button type="button" class="image-action-btn change"
+                  onclick="document.getElementById('coverImageInput').click()">
+                  <i class="fas fa-sync-alt"></i>
+                  Change Image
+                </button>
+                <button type="button" class="image-action-btn remove"
+                  onclick="removeCoverImage()">
+                  <i class="fas fa-trash"></i>
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================= CONTENT ================= -->
+          <div class="rich-editor-container">
+            <!-- TinyMCE textarea - content will be loaded by JavaScript -->
+            <textarea id="editor" name="content">
+              {% if is_edit %}{{ content.content|safe }}{% endif %}
+            </textarea>
+          </div>
+
+          <!-- Published Status Checkbox -->
+          {% if is_edit %}
+          <div style="margin: 20px 0; padding: 15px; background: var(--bg-tertiary); border-radius: var(--radius-md);">
+            <div class="checkbox-group" style="margin: 0;">
+              <input type="checkbox" id="is_published" name="is_published" 
+                     {% if content.is_published %}checked{% endif %}>
+              <label for="is_published" style="font-weight: 600; color: var(--text-primary);">
+                Publish this content (make it visible to users)
+              </label>
+            </div>
+            <p style="font-size: 14px; color: var(--text-secondary); margin: 8px 0 0 26px;">
+              {% if content.is_published %}
+                This content is currently published and visible to users.
+              {% else %}
+                This content is currently unpublished (draft).
+              {% endif %}
+            </p>
+          </div>
+          {% endif %}
+
+          <!-- ================= COUNTS ================= -->
+          <div class="char-count">
+            <i class="fas fa-font"></i>
+            <span id="charCount">0</span> characters
+            <span style="color: var(--text-tertiary); margin: 0 8px;">•</span>
+            <i class="fas fa-code"></i>
+            <span id="codeCount">0</span> code blocks
+            <span style="color: var(--text-tertiary); margin: 0 8px;">•</span>
+            <i class="fas fa-square-root-alt"></i>
+            <span id="mathCount">0</span> equations
+          </div>
+
+          <!-- ================= ACTIONS ================= -->
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+              <i class="fas fa-times"></i>
+              Cancel
+            </button>
+
+            <button type="submit" id="submitBtn" class="btn btn-primary">
+              <i class="fas fa-paper-plane"></i>
+              {% if is_edit %}
+                Update Content
+              {% else %}
+                Publish Content
+              {% endif %}
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    </form>
+
+    <div class="editor-tips">
+      <h3><i class="fas fa-lightbulb"></i> Writing tips</h3>
+      <ul>
+        <li>Use tables to organize data and comparisons</li>
+        <li>Add code blocks with syntax highlighting using the code button</li>
+        <li>Insert mathematical equations using the equation button</li>
+        <li>Add images to make your article visually engaging</li>
+        <li>Use headings to structure your content</li>
+        <li>Keep paragraphs short for better readability</li>
+        <li>Preview your article before publishing</li>
+      </ul>
+    </div>
+  </div>
+</main>
+
+<!-- Prism.js Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+
+<script>
+// Global variables
+let isEditMode = {% if is_edit %}true{% else %}false{% endif %};
+let contentId = {% if is_edit %}{{ content.pk }}{% else %}null{% endif %};
+const DRAFT_KEY = isEditMode ? `ecadbridge_content_draft_${contentId}` : 'ecadbridge_content_draft';
+let isSubmitting = false;
+let autoSaveInterval;
+
+/* =========================
+   Initialize Editor Data
+========================= */
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialize title auto-resize
+    const titleInput = document.getElementById('titleInput');
+    if (titleInput) {
+        titleInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+            saveDraft();
+            updateCharCount();
+        });
+        
+        // Initial resize
+        setTimeout(() => {
+            titleInput.style.height = 'auto';
+            titleInput.style.height = (titleInput.scrollHeight) + 'px';
+        }, 100);
+    }
+    
+    // Initialize cover image preview
+    initCoverImagePreview();
+    
+    // Initialize post type toggle
+    initPostTypeToggle();
+    
+    // Start auto-save
+    startAutoSave();
+});
+
+/* =========================
+   Cover Image Functions
+========================= */
+const coverImageInput = document.getElementById('coverImageInput');
+const coverImagePreview = document.getElementById('coverImagePreview');
+const coverImageUpload = document.getElementById('coverImageUpload');
+const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+const imageActions = document.getElementById('imageActions');
+
+function initCoverImagePreview() {
+    // Check if cover image exists
+    const hasCoverImage = coverImagePreview.src && 
+                         !coverImagePreview.src.includes('undefined') && 
+                         coverImagePreview.src.trim() !== '';
+    
+    if (hasCoverImage) {
+        coverImagePreview.classList.add('visible');
+        uploadPlaceholder.style.display = 'none';
+        coverImageUpload.classList.add('has-image');
+        imageActions.style.display = 'flex';
+    }
+}
+
+coverImageInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        if (!file.type.match('image.*')) {
+            showNotification('Please select an image file', 'error');
+            return;
+        }
+        
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            showNotification('Image size should be less than 5MB', 'error');
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            coverImagePreview.src = event.target.result;
+            coverImagePreview.classList.add('visible');
+            uploadPlaceholder.style.display = 'none';
+            coverImageUpload.classList.add('has-image');
+            imageActions.style.display = 'flex';
+            showNotification('Cover image uploaded successfully', 'success');
+            saveDraft();
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Drag and drop functionality
+coverImageUpload.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.style.borderColor = 'var(--primary-color)';
+    this.style.backgroundColor = 'var(--primary-light)';
+    this.style.transform = 'translateY(-2px)';
+});
+
+coverImageUpload.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.style.borderColor = '';
+    this.style.backgroundColor = '';
+    this.style.transform = '';
+});
+
+coverImageUpload.addEventListener('drop', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.style.borderColor = '';
+    this.style.backgroundColor = '';
+    this.style.transform = '';
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        const file = files[0];
+        if (file.type.match('image.*')) {
+            coverImageInput.files = files;
+            const event = new Event('change');
+            coverImageInput.dispatchEvent(event);
+        } else {
+            showNotification('Please drop an image file', 'error');
+        }
+    }
+});
+
+function removeCoverImage() {
+    coverImagePreview.src = '';
+    coverImagePreview.classList.remove('visible');
+    uploadPlaceholder.style.display = 'flex';
+    coverImageUpload.classList.remove('has-image');
+    imageActions.style.display = 'none';
+    coverImageInput.value = '';
+    showNotification('Cover image removed', 'warning');
+    saveDraft();
+}
+
+/* =========================
+   Post/Article Toggle Functions
+========================= */
+function initPostTypeToggle() {
+    const toggle = document.getElementById('postTypeToggle');
+    const postTypeInput = document.getElementById('postTypeInput');
+    
+    if (!toggle || !postTypeInput) return;
+    
+    // Get current value
+    let currentValue = postTypeInput.value;
+    
+    // Set toggle state
+    if (currentValue === 'post') {
+        toggle.checked = false;
+        updateToggleUI('post');
+    } else {
+        toggle.checked = true;
+        updateToggleUI('article');
+    }
+    
+    // Add change event listener
+    toggle.addEventListener('change', function() {
+        if (this.checked) {
+            postTypeInput.value = 'article';
+            updateToggleUI('article');
+        } else {
+            postTypeInput.value = 'post';
+            updateToggleUI('post');
+        }
+        saveDraft();
+    });
+}
+
+function updateToggleUI(type) {
+    const pageTitle = document.getElementById('pageTitle');
+    const pageSubtitle = document.getElementById('pageSubtitle');
+    const submitBtn = document.getElementById('submitBtn');
+    const togglePostText = document.querySelector('.toggle-text.post');
+    const toggleArticleText = document.querySelector('.toggle-text.article');
+    
+    if (type === 'article') {
+        if (!isEditMode) {
+            pageTitle.textContent = 'Share your knowledge';
+            pageSubtitle.textContent = 'Write an article to share with your professional network';
+        }
+        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> ' + 
+            (isEditMode ? 'Update article' : 'Publish article');
+        
+        // Update toggle text colors
+        if (togglePostText) togglePostText.style.color = 'var(--text-secondary)';
+        if (toggleArticleText) toggleArticleText.style.color = 'white';
+    } else {
+        if (!isEditMode) {
+            pageTitle.textContent = 'Share your thoughts';
+            pageSubtitle.textContent = 'Write a post to share with your network';
+        }
+        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> ' + 
+            (isEditMode ? 'Update post' : 'Publish post');
+        
+        // Update toggle text colors
+        if (togglePostText) togglePostText.style.color = 'white';
+        if (toggleArticleText) toggleArticleText.style.color = 'var(--text-secondary)';
+    }
+}
+
+/* =========================
+   TinyMCE Initialization
+========================= */
+// Get initial content from textarea
+const contentTextarea = document.getElementById('editor');
+let initialContent = '';
+if (contentTextarea) {
+    initialContent = contentTextarea.value.trim();
+}
+
+tinymce.init({  
+    selector: '#editor',
+    license_key: 'gpl',
+    branding: false,
+    height: 500,
+    menubar: false,
+    paste_data_images: true,
+    statusbar: false,
+    resize: false,
+    relative_urls: false,
+    remove_script_host: false,
+    document_base_url: '{{ request.scheme }}://{{ request.get_host }}/',
+    
+    // Set initial content
+    init_instance_callback: function(editor) {
+        // Load initial content if it exists
+        if (initialContent && initialContent !== '') {
+            editor.setContent(initialContent);
+        }
+        
+        // Update counts
+        updateCharCount();
+        updateCodeCount();
+        updateMathCount();
+        
+        // Process MathJax if needed
+        if (window.MathJax && initialContent.includes('$')) {
+            MathJax.Hub.Queue(['Typeset', MathJax.Hub, editor.getBody()]);
+        }
+        
+        // Restore draft if exists
+        restoreDraft();
+    },
+    
+    content_style: `
+        body { 
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-size: 18px;
+            line-height: 1.8;
+            color: #000000e6;
+            padding: 32px;
+            max-width: 100%;
+        }
+        h1, h2, h3 { 
+            font-weight: 600; 
+            margin: 32px 0 16px;
+            line-height: 1.3;
+        }
+        h1 { font-size: 32px; }
+        h2 { font-size: 28px; }
+        h3 { font-size: 24px; }
+        p { 
+            margin: 0 0 24px;
+        }
+        blockquote {
+            border-left: 4px solid #0a66c2;
+            margin: 24px 0;
+            padding-left: 20px;
+            font-style: italic;
+            color: #00000099;
+        }
+        img { 
+            display: block; 
+            margin: 32px auto; 
+            max-width: 100%; 
+            height: auto; 
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        table th {
+            background: #eef3f8;
+            border: 1px solid #d0d8e0;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #000000e6;
+        }
+        table td {
+            border: 1px solid #d0d8e0;
+            padding: 16px;
+            color: #00000099;
+        }
+        table tr:nth-child(even) {
+            background: #f9fafb;
+        }
+        ul, ol {
+            margin: 16px 0 24px;
+            padding-left: 24px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .code-block-wrapper {
+            margin: 32px 0 !important;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 1px solid #404040;
+        }
+        .code-header {
+            background: #1e1e1e;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #404040;
+        }
+        .code-language {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #cccccc;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Monaco, 'Cascadia Mono', monospace;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .code-content {
+            background: #2d2d2d;
+            margin: 0;
+            padding: 16px;
+            overflow-x: auto;
+        }
+        .code-content pre {
+            margin: 0;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Monaco, 'Cascadia Mono', monospace;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #f8f8f2 !important;
+        }
+        .code-content code {
+            font-family: inherit;
+            background: transparent;
+            padding: 0;
+            color: #f8f8f2 !important;
+        }
+        .line-numbers {
+            position: absolute;
+            left: 0;
+            top: 0;
+            padding: 16px 8px;
+            background: #1e1e1e;
+            color: #999999;
+            text-align: right;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Monaco, 'Cascadia Mono', monospace;
+            font-size: 15px;
+            line-height: 1.6;
+            border-right: 1px solid #404040;
+            user-select: none;
+        }
+        .math-equation-wrapper {
+            margin: 24px 0;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .math-equation-wrapper:hover {
+            border-color: #0a66c2;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .math-equation-wrapper.inline {
+            display: inline-block;
+            margin: 0 4px;
+            padding: 8px 16px;
+            min-height: 0;
+            vertical-align: middle;
+        }
+        .math-equation-content {
+            width: 100%;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .math-equation-content .MathJax {
+            outline: none !important;
+        }
+        .math-equation-actions {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .math-equation-wrapper:hover .math-equation-actions {
+            opacity: 1;
+        }
+        .math-equation-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            background: white;
+            border: 1px solid #d0d8e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 13px;
+            color: #00000099;
+            transition: all 0.3s ease;
+        }
+        .math-equation-btn:hover {
+            background: #eef3f8;
+            color: #000000e6;
+        }
+    `,
+
+    plugins: [
+        'image',
+        'table',
+        'lists',
+        'link',
+        'code',
+        'autoresize',
+        'wordcount',
+        'emoticons',
+        'searchreplace',
+        'quickbars',
+        'help'
+    ],
+    
+    toolbar: `
+        blocks fontfamily fontsize | 
+        bold italic underline strikethrough | 
+        forecolor backcolor | 
+        alignleft aligncenter alignright alignjustify | 
+        bullist numlist | 
+        link image table | 
+        customcodeblock | 
+        mathequation | 
+        blockquote | 
+        undo redo | 
+        removeformat help
+    `,
+
+    quickbars_insert_toolbar: 'image table link customcodeblock mathequation',
+    quickbars_selection_toolbar: 'bold italic underline | h2 h3 | blockquote | alignleft aligncenter alignright',
+
+    table_toolbar: 'tableprops tabledelete | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
+    table_default_styles: {
+        'width': '100%',
+        'border-collapse': 'collapse'
+    },
+
+    images_upload_handler: (blobInfo, progress) => new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.withCredentials = false;
+        xhr.open('POST', '/upload-image/');
+        xhr.setRequestHeader('X-CSRFToken', getCSRFToken());
+
+        xhr.upload.onprogress = (e) => {
+            progress(e.loaded / e.total * 100);
+        };
+
+        xhr.onload = () => {
+            if (xhr.status === 403) {
+                reject({ message: 'HTTP Error: ' + xhr.status, remove: true });
+                return;
+            }
+            if (xhr.status < 200 || xhr.status >= 300) {
+                reject('HTTP Error: ' + xhr.status);
+                return;
+            }
+            const json = JSON.parse(xhr.responseText);
+            if (!json || typeof json.location != 'string') {
+                reject('Invalid JSON: ' + xhr.responseText);
+                return;
+            }
+            resolve(json.location);
+        };
+
+        xhr.onerror = () => {
+            reject('Image upload failed due to a Network error.');
+        };
+
+        const formData = new FormData();
+        formData.append('file', blobInfo.blob(), blobInfo.filename());
+        xhr.send(formData);
+    }),
+
+    setup: function (editor) {
+        // Add custom code block button
+        editor.ui.registry.addButton('customcodeblock', {
+            icon: 'sourcecode',
+            tooltip: 'Insert code block (Ctrl+Alt+C)',
+            onAction: openCodeModal
+        });
+
+        // Add custom math equation button
+        editor.ui.registry.addButton('mathequation', {
+            icon: 'mathematical-symbol',
+            tooltip: 'Insert mathematical equation (Ctrl+Alt+M)',
+            onAction: openMathModal
+        });
+
+        editor.on('change keyup', function() {
+            saveDraft();
+            updateCharCount();
+            updateCodeCount();
+            updateMathCount();
+        });
+        
+        editor.on('init', function() {
+            // Setup MathJax for editor
+            setupMathJaxInEditor();
+        });
+    }
+});
+
+/* =========================
+   MathJax Configuration for Editor
+========================= */
+function setupMathJaxInEditor() {
+    if (window.MathJax) {
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processClass: 'math-equation-content'
+            },
+            showProcessingMessages: false,
+            messageStyle: "none",
+            skipStartupTypeset: true,
+            showMathMenu: true,
+            showMathMenuMSIE: true,
+            menuSettings: {
+                context: "MathJax",
+                zoom: "Click"
+            }
+        });
+        
+        // Process MathJax in the editor
+        const editor = tinymce.get('editor');
+        if (editor) {
+            MathJax.Hub.Queue(['Typeset', MathJax.Hub, editor.getBody()]);
+        }
+    }
+}
+
+/* =========================
+   Modal Functions
+========================= */
+// Code Modal
+const codeModal = document.getElementById('codeModal');
+const closeCodeModalBtn = document.getElementById('closeCodeModal');
+const cancelCode = document.getElementById('cancelCode');
+const insertCodeBtn = document.getElementById('insertCode');
+const codeInput = document.getElementById('codeInput');
+const languageList = document.getElementById('languageList');
+
+// Math Modal
+const mathModal = document.getElementById('mathModal');
+const closeMathModalBtn = document.getElementById('closeMathModal');
+const cancelMath = document.getElementById('cancelMath');
+const insertMathBtn = document.getElementById('insertMath');
+const mathInput = document.getElementById('mathInput');
+const mathPreview = document.getElementById('mathPreview');
+const equationTypeOptions = document.querySelectorAll('.equation-type-option');
+
+let currentEquationType = 'inline';
+let mathJaxProcessing = false;
+
+// Language list (only Plain Text)
+const languages = [
+    { name: 'Plain Text', value: 'plaintext', icon: 'fas fa-file-alt', color: '#666666' }
+];
+
+function openCodeModal() {
+    codeModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    setTimeout(() => {
+        codeInput.focus();
+        codeInput.select();
+    }, 100);
+    
+    populateLanguageList();
+}
+
+function closeCodeModal() {
+    codeModal.classList.remove('active');
+    document.body.style.overflow = '';
+    codeInput.value = '';
+}
+
+function populateLanguageList() {
+    languageList.innerHTML = '';
+    languages.forEach(lang => {
+        const li = document.createElement('li');
+        li.className = 'language-item active';
+        li.setAttribute('data-language', lang.value);
+        li.innerHTML = `
+            <i class="${lang.icon}" style="color: ${lang.color}"></i>
+            <span>${lang.name}</span>
+        `;
+        languageList.appendChild(li);
+    });
+}
+
+function insertCode() {
+    const code = codeInput.value.trim();
+    if (!code) {
+        showNotification('Please enter some code', 'warning');
+        return;
+    }
+
+    const showLineNumbers = document.getElementById('lineNumbers').checked;
+    const showCopyBtn = document.getElementById('showCopy').checked;
+    const langName = 'Plain Text';
+    
+    // Generate line numbers if enabled
+    let lineNumbersHTML = '';
+    if (showLineNumbers) {
+        const lines = code.split('\n').length;
+        for (let i = 1; i <= lines; i++) {
+            lineNumbersHTML += `<span class="line-number">${i}</span>`;
+        }
+    }
+
+    // Create code block HTML
+    const codeBlockHTML = `
+        <div class="code-block-wrapper" contenteditable="false" data-language="plaintext">
+            <div class="code-header">
+                <div class="code-language">
+                    <i class="fas fa-file-alt"></i>
+                    <span>${langName}</span>
+                </div>
+                ${showCopyBtn ? `
+                <div class="code-actions">
+                    <button class="code-btn copy-btn" onclick="copyCodeBlock(this)" title="Copy to clipboard">
+                        <i class="fas fa-copy"></i>
+                        Copy
+                    </button>
+                </div>
+                ` : ''}
+            </div>
+            <div class="code-content">
+                ${showLineNumbers ? `<div class="line-numbers">${lineNumbersHTML}</div>` : ''}
+                <pre${showLineNumbers ? ' class="line-numbers"' : ''}><code>${escapeHtml(code)}</code></pre>
+            </div>
+        </div>
+    `;
+
+    // Insert into TinyMCE editor
+    const editor = tinymce.get('editor');
+    if (editor) {
+        editor.execCommand('mceInsertContent', false, '<p><br></p>');
+        editor.execCommand('mceInsertContent', false, codeBlockHTML);
+        editor.execCommand('mceInsertContent', false, '<p><br></p>');
+        
+        showNotification('Code block inserted successfully', 'success');
+        saveDraft();
+    }
+
+    closeCodeModal();
+}
+
+// Math Modal Functions
+function openMathModal() {
+    mathModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    setTimeout(() => {
+        mathInput.focus();
+        mathInput.select();
+    }, 100);
+}
+
+function closeMathModal() {
+    mathModal.classList.remove('active');
+    document.body.style.overflow = '';
+    mathInput.value = '';
+    mathPreview.innerHTML = `
+        <span class="math-equation-placeholder">
+            <i class="fas fa-calculator"></i>
+            Preview will appear here
+        </span>
+    `;
+}
+
+// Set up equation type selection
+equationTypeOptions.forEach(option => {
+    option.addEventListener('click', function() {
+        equationTypeOptions.forEach(opt => opt.classList.remove('active'));
+        this.classList.add('active');
+        currentEquationType = this.dataset.type;
+        updateMathPreview();
+    });
+});
+
+// Update math preview in real-time
+mathInput.addEventListener('input', updateMathPreview);
+
+function updateMathPreview() {
+    const latex = mathInput.value.trim();
+    
+    if (!latex) {
+        mathPreview.innerHTML = `
+            <span class="math-equation-placeholder">
+                <i class="fas fa-calculator"></i>
+                Preview will appear here
+            </span>
+        `;
+        return;
+    }
+    
+    // Wrap with appropriate delimiters for preview
+    const wrappedLatex = currentEquationType === 'inline' ? `$${latex}$` : `$$${latex}$$`;
+    
+    // Clear previous content
+    mathPreview.innerHTML = '';
+    
+    // Create a span for MathJax to process
+    const mathSpan = document.createElement('span');
+    mathSpan.textContent = wrappedLatex;
+    mathPreview.appendChild(mathSpan);
+    
+    // Process with MathJax
+    if (!mathJaxProcessing && window.MathJax) {
+        mathJaxProcessing = true;
+        MathJax.Hub.Queue(
+            ['Typeset', MathJax.Hub, mathPreview],
+            function() {
+                mathJaxProcessing = false;
+            }
+        );
+    }
+}
+
+function insertLatexExample(element) {
+    const example = element.textContent;
+    mathInput.value += example;
+    mathInput.focus();
+    updateMathPreview();
+    
+    // Add click animation
+    element.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        element.style.transform = '';
+    }, 150);
+}
+
+function insertMathEquation() {
+    const latex = mathInput.value.trim();
+    if (!latex) {
+        showNotification('Please enter a LaTeX equation', 'warning');
+        return;
+    }
+
+    // Create math equation HTML
+    const equationHTML = `
+        <div class="math-equation-wrapper ${currentEquationType}" contenteditable="false" data-type="${currentEquationType}" data-latex="${escapeHtml(latex)}">
+            <div class="math-equation-content">
+                <span>${currentEquationType === 'inline' ? `$${latex}$` : `$$${latex}$$`}</span>
+            </div>
+            <div class="math-equation-actions">
+                <button class="math-equation-btn edit" onclick="editMathEquation(this)" title="Edit equation">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="math-equation-btn remove" onclick="removeMathEquation(this)" title="Remove equation">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `;
+
+    // Insert into TinyMCE editor
+    const editor = tinymce.get('editor');
+    if (editor) {
+        if (currentEquationType === 'inline') {
+            editor.execCommand('mceInsertContent', false, equationHTML);
+        } else {
+            editor.execCommand('mceInsertContent', false, '<p><br></p>');
+            editor.execCommand('mceInsertContent', false, equationHTML);
+            editor.execCommand('mceInsertContent', false, '<p><br></p>');
+        }
+        
+        setTimeout(() => {
+            // Re-render MathJax in the editor
+            if (window.MathJax) {
+                MathJax.Hub.Queue(['Typeset', MathJax.Hub, editor.getBody()]);
+            }
+            updateMathCount();
+            saveDraft();
+            showNotification('Equation inserted successfully', 'success');
+        }, 100);
+    }
+
+    closeMathModal();
+}
+
+function editMathEquation(button) {
+    const wrapper = button.closest('.math-equation-wrapper');
+    const latex = wrapper.dataset.latex;
+    const type = wrapper.dataset.type;
+    
+    // Open math modal with existing data
+    openMathModal();
+    
+    // Set values
+    mathInput.value = latex;
+    equationTypeOptions.forEach(opt => opt.classList.remove('active'));
+    document.querySelector(`.equation-type-option[data-type="${type}"]`).classList.add('active');
+    currentEquationType = type;
+    updateMathPreview();
+    
+    // Remove the old equation after insertion
+    insertMathBtn.onclick = function() {
+        wrapper.remove();
+        insertMathEquation();
+        closeMathModal();
+    };
+}
+
+function removeMathEquation(button) {
+    const wrapper = button.closest('.math-equation-wrapper');
+    wrapper.style.transform = 'scale(0.95)';
+    wrapper.style.opacity = '0.5';
+    
+    setTimeout(() => {
+        wrapper.remove();
+        updateMathCount();
+        saveDraft();
+        showNotification('Equation removed', 'warning');
+    }, 200);
+}
+
+/* =========================
+   Helper Functions
+========================= */
+function getCSRFToken() {
+    const token = document.querySelector('[name=csrfmiddlewaretoken]');
+    return token ? token.value : '';
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function copyCodeBlock(button) {
+    const codeBlock = button.closest('.code-block-wrapper');
+    const codeElement = codeBlock.querySelector('code');
+    const textToCopy = codeElement.textContent;
+    
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        const originalHTML = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        button.style.color = 'var(--code-green)';
+        button.style.borderColor = 'var(--code-green)';
+        button.disabled = true;
+        button.style.transform = 'translateY(-2px)';
+        
+        setTimeout(() => {
+            button.innerHTML = originalHTML;
+            button.style.color = '';
+            button.style.borderColor = '';
+            button.disabled = false;
+            button.style.transform = '';
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+        showNotification('Failed to copy code', 'error');
+    });
+}
+
+/* =========================
+   Count Functions
+========================= */
+function updateCharCount() {
+    const editor = tinymce.get('editor');
+    if (!editor) return;
+    
+    const content = editor.getContent({format: 'text'});
+    const charCount = content.length;
+    const charCountEl = document.getElementById('charCount');
+    charCountEl.textContent = charCount.toLocaleString();
+    
+    if (charCount < 100) {
+        charCountEl.style.color = '#d32f2f';
+    } else if (charCount < 500) {
+        charCountEl.style.color = '#f57c00';
+    } else {
+        charCountEl.style.color = 'var(--text-tertiary)';
+    }
+}
+
+function updateCodeCount() {
+    const editor = tinymce.get('editor');
+    if (!editor) return;
+    
+    const content = editor.getContent();
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content;
+    const codeBlocks = tempDiv.querySelectorAll('.code-block-wrapper, pre code');
+    document.getElementById('codeCount').textContent = codeBlocks.length;
+}
+
+function updateMathCount() {
+    const editor = tinymce.get('editor');
+    if (!editor) return;
+    
+    const content = editor.getContent();
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content;
+    const mathEquations = tempDiv.querySelectorAll('.math-equation-wrapper');
+    document.getElementById('mathCount').textContent = mathEquations.length;
+}
+
+/* =========================
+   Draft Functions
+========================= */
+function saveDraft() {
+    if (isSubmitting) return;
+    
+    const editor = tinymce.get('editor');
+    const title = document.getElementById('titleInput')?.value || '';
+    const coverImage = document.getElementById('coverImagePreview')?.src || '';
+    const postType = document.getElementById('postTypeInput')?.value || 'article';
+    
+    const draft = {
+        title: title,
+        content: editor ? editor.getContent() : '',
+        coverImage: coverImage,
+        postType: postType,
+        timestamp: Date.now()
+    };
+    
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    updateSaveStatus(true);
+}
+
+function restoreDraft() {
+    // Don't restore draft in edit mode if we already have content
+    if (isEditMode && initialContent && initialContent.trim() !== '') {
+        return;
+    }
+    
+    const draft = localStorage.getItem(DRAFT_KEY);
+    if (!draft) return;
+    
+    try {
+        const data = JSON.parse(draft);
+        
+        // Only restore if we're not in edit mode with existing content
+        if (!isEditMode || !initialContent || initialContent.trim() === '') {
+            const editor = tinymce.get('editor');
+            if (editor && data.content) {
+                editor.setContent(data.content);
+            }
+        }
+        
+        // Always restore title and post type
+        const titleInput = document.getElementById('titleInput');
+        if (titleInput && data.title && (!isEditMode || !titleInput.value)) {
+            titleInput.value = data.title;
+            titleInput.style.height = 'auto';
+            titleInput.style.height = (titleInput.scrollHeight) + 'px';
+        }
+        
+        const postTypeInput = document.getElementById('postTypeInput');
+        if (postTypeInput && data.postType && (!isEditMode || !postTypeInput.value)) {
+            postTypeInput.value = data.postType;
+            // Update toggle
+            const toggle = document.getElementById('postTypeToggle');
+            if (toggle) {
+                toggle.checked = data.postType === 'article';
+                updateToggleUI(data.postType);
+            }
+        }
+        
+        // Restore cover image if not already set
+        if (data.coverImage && data.coverImage !== '' && 
+            !coverImagePreview.src && !coverImagePreview.classList.contains('visible')) {
+            coverImagePreview.src = data.coverImage;
+            coverImagePreview.classList.add('visible');
+            uploadPlaceholder.style.display = 'none';
+            coverImageUpload.classList.add('has-image');
+            imageActions.style.display = 'flex';
+        }
+        
+        // Update save status
+        if (data.timestamp) {
+            const saveTime = new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('saveStatus').innerHTML = 
+                `<i class="fas fa-history"></i><span>Last saved: ${saveTime}</span>`;
+        }
+        
+        // Update counts
+        setTimeout(() => {
+            updateCharCount();
+            updateCodeCount();
+            updateMathCount();
+        }, 500);
+    } catch (e) {
+        console.error('Failed to restore draft:', e);
+    }
+}
+
+function startAutoSave() {
+    if (autoSaveInterval) clearInterval(autoSaveInterval);
+    autoSaveInterval = setInterval(saveDraft, 30000); // Save every 30 seconds
+}
+
+function updateSaveStatus(success) {
+    const statusEl = document.getElementById('saveStatus');
+    if (success) {
+        statusEl.innerHTML = `<i class="fas fa-check"></i><span>Saved just now</span>`;
+        statusEl.style.background = 'var(--primary-light)';
+        statusEl.style.color = 'var(--primary-color)';
+        setTimeout(() => {
+            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            statusEl.innerHTML = `<i class="fas fa-history"></i><span>Last saved: ${time}</span>`;
+            statusEl.style.background = '';
+            statusEl.style.color = '';
+        }, 2000);
+    }
+}
+
+/* =========================
+   Notification Function
+========================= */
+function showNotification(message, type = 'info') {
+    const existingNotification = document.querySelector('.notification');
+    if (existingNotification) {
+        existingNotification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => existingNotification.remove(), 300);
+    }
+    
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+        <span>${message}</span>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+/* =========================
+   Form Submission
+========================= */
+document.getElementById('articleForm').addEventListener('submit', function (e) {
+    const btn = document.getElementById('submitBtn');
+    const originalText = btn.innerHTML;
+    
+    // Change button to loading state
+    btn.innerHTML = '<i class="fas fa-spinner loading-spinner"></i> Publishing...';
+    btn.disabled = true;
+    
+    // Save TinyMCE content to the textarea
+    const editor = tinymce.get('editor');
+    if (editor) {
+        editor.save();
+    }
+    
+    // Remove draft from localStorage
+    localStorage.removeItem(DRAFT_KEY);
+    
+    // Form will submit normally
+});
+
+/* =========================
+   Event Listeners
+========================= */
+closeCodeModalBtn.addEventListener('click', closeCodeModal);
+cancelCode.addEventListener('click', closeCodeModal);
+insertCodeBtn.addEventListener('click', insertCode);
+
+closeMathModalBtn.addEventListener('click', closeMathModal);
+cancelMath.addEventListener('click', closeMathModal);
+insertMathBtn.addEventListener('click', insertMathEquation);
+
+codeModal.addEventListener('click', (e) => {
+    if (e.target === codeModal) {
+        closeCodeModal();
+    }
+});
+
+mathModal.addEventListener('click', (e) => {
+    if (e.target === mathModal) {
+        closeMathModal();
+    }
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+    // Save draft
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        saveDraft();
+    }
+    
+    // Open code modal
+    if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'c') {
+        e.preventDefault();
+        openCodeModal();
+    }
+    
+    // Open math modal
+    if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'm') {
+        e.preventDefault();
+        openMathModal();
+    }
+    
+    // Close modals with Escape
+    if (e.key === 'Escape') {
+        if (codeModal.classList.contains('active')) {
+            closeCodeModal();
+        }
+        if (mathModal.classList.contains('active')) {
+            closeMathModal();
+        }
+    }
+});
+
+/* =========================
+   beforeunload protection
+========================= */
+window.addEventListener('beforeunload', function (e) {
+    // Check if form is currently submitting
+    const btn = document.getElementById('submitBtn');
+    if (btn && btn.disabled) {
+        return; // Form is submitting, don't show warning
+    }
+    
+    const editor = tinymce.get('editor');
+    const titleVal = document.getElementById('titleInput')?.value.trim() || '';
+    const contentVal = editor ? editor.getContent({format: 'text'}).trim() : '';
+    
+    if (titleVal || contentVal) {
+        e.preventDefault();
+        e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+        return e.returnValue;
+    }
+});
+
+// Initialize MathJax
+if (window.MathJax) {
+    MathJax.Hub.Configured();
+}
+</script>
+</body>
+</html>

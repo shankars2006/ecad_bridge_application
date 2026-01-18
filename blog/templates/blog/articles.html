@@ -1,0 +1,1494 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Articles | ECAD Bridge</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #7c2d12;       /* Warm burgundy */
+            --primary-dark: #5c220d;        /* Darker burgundy */
+            --primary-light: #fed7aa;       /* Light peach */
+            --secondary-color: #854d0e;     /* Golden brown */
+            --accent-color: #dc2626;        /* Crimson red */
+            --accent-light: #fee2e2;        /* Light red */
+            --text-primary: #1c1917;        /* Rich black */
+            --text-secondary: #57534e;      /* Warm gray */
+            --text-tertiary: #78716c;       /* Lighter warm gray */
+            --bg-primary: #ffffff;          /* White */
+            --bg-secondary: #fafaf9;        /* Stone background */
+            --bg-tertiary: #f5f5f4;         /* Slightly darker stone */
+            --border-color: #d6d3d1;        /* Warm border */
+            --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.1);
+            --shadow-dark: 0 12px 36px rgba(0, 0, 0, 0.15);
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --transition-fast: 200ms ease;
+            --transition-medium: 350ms ease;
+            --font-heading: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            color: var(--text-primary);
+            background-color: var(--bg-secondary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Header */
+        .site-header {
+            background-color: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo i {
+            font-size: 22px;
+        }
+
+        .logo span {
+            color: var(--text-primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav-links a {
+            font-weight: 500;
+            transition: all var(--transition-fast);
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+            background-color: var(--primary-light);
+        }
+
+        .nav-links a.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        /* Page Header */
+        .page-header {
+            padding: 60px 0 40px;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, #ffffff 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at 20% 80%, rgba(124, 45, 18, 0.05) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(220, 38, 38, 0.05) 0%, transparent 50%);
+            z-index: 0;
+        }
+
+        .page-header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 16px;
+            line-height: 1.2;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .articles-count {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 24px;
+            box-shadow: 0 4px 12px rgba(124, 45, 18, 0.2);
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px 60px;
+        }
+
+        /* Filters */
+        .articles-filters {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .filter-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 10px 22px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .filter-btn:hover {
+            background-color: var(--bg-tertiary);
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(124, 45, 18, 0.2);
+        }
+
+        .sort-select {
+            padding: 10px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 15px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .sort-select:hover {
+            border-color: var(--primary-color);
+        }
+
+        /* Articles Grid */
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 32px;
+            margin-bottom: 60px;
+        }
+
+        /* Article Card */
+        .article-card {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-light);
+            transition: all var(--transition-medium);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+        }
+
+        .article-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-medium);
+            border-color: var(--primary-light);
+        }
+
+        /* Article Image */
+        .article-image {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            background-color: var(--bg-tertiary);
+        }
+
+        .article-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform var(--transition-medium);
+        }
+
+        .article-card:hover .article-image img {
+            transform: scale(1.05);
+        }
+
+        /* Fallback for missing images */
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-light), #fed7aa);
+            color: var(--primary-color);
+        }
+
+        .image-placeholder i {
+            font-size: 48px;
+        }
+
+        /* Article Category Badge */
+        .article-category {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            z-index: 2;
+        }
+
+        /* Article Content */
+        .article-content {
+            padding: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .article-header {
+            margin-bottom: 16px;
+        }
+
+        .article-title {
+            font-size: 22px;
+            font-weight: 700;
+            line-height: 1.3;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .author-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .author-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .author-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .article-date {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-tertiary);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .article-date i {
+            font-size: 12px;
+        }
+
+        .article-excerpt {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .read-more-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: 15px;
+            transition: all var(--transition-fast);
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .read-more-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(124, 45, 18, 0.2);
+        }
+
+        /* Enhanced No Articles Section */
+        .no-articles {
+            text-align: center;
+            padding: 80px 40px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 249, 0.98) 100%);
+            border-radius: var(--radius-lg);
+            margin: 40px auto;
+            border: 2px solid rgba(124, 45, 18, 0.15);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            max-width: 800px;
+        }
+
+        .no-articles::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(124, 45, 18, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(220, 38, 38, 0.05) 0%, transparent 40%);
+            z-index: 0;
+        }
+
+        .no-articles-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .no-articles-icon {
+            font-size: 72px;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .no-articles-title {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            line-height: 1.2;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            letter-spacing: -0.5px;
+        }
+
+        .no-articles-text {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.7;
+            font-weight: 500;
+        }
+
+        .browse-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 16px 40px;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: 16px;
+            transition: all var(--transition-fast);
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 8px 25px rgba(124, 45, 18, 0.3);
+        }
+
+        .browse-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(124, 45, 18, 0.4);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+        }
+
+        /* Light Newsletter Section (changed from dark to light) */
+        .newsletter-section {
+            background: linear-gradient(135deg, var(--primary-light) 0%, #fef3c7 50%, #fde68a 100%);
+            border-radius: var(--radius-lg);
+            padding: 80px 60px;
+            text-align: center;
+            margin: 100px 0 80px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            border: none;
+            color: var(--text-primary);
+        }
+
+        .newsletter-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(124, 45, 18, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(220, 38, 38, 0.1) 0%, transparent 50%),
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(255, 255, 255, 0.1) 10px,
+                    rgba(255, 255, 255, 0.1) 20px
+                );
+            animation: backgroundMove 20s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes backgroundMove {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .newsletter-content {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .newsletter-icon {
+            font-size: 64px;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .newsletter-title {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            line-height: 1.2;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .newsletter-text {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 50px;
+            line-height: 1.7;
+            font-weight: 500;
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        
+            backdrop-filter: blur(10px);
+            padding: 8px;
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(124, 45, 18, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .newsletter-input {
+            flex: 1;
+            padding: 20px 24px;
+            border: 2px solid transparent;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            transition: all var(--transition-fast);
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .newsletter-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(124, 45, 18, 0.1);
+        }
+
+        .newsletter-input::placeholder {
+            color: var(--text-tertiary);
+            font-weight: 400;
+        }
+
+        .newsletter-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+            box-shadow: 0 8px 20px rgba(124, 45, 18, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .newsletter-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .newsletter-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(124, 45, 18, 0.4);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+        }
+
+        .newsletter-btn:hover::before {
+            left: 100%;
+        }
+
+        /* Benefits Section */
+        .newsletter-benefits {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 50px;
+            flex-wrap: wrap;
+        }
+
+        .benefit-item {
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .benefit-icon {
+            font-size: 32px;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+        }
+
+        .benefit-text {
+            font-size: 15px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: 60px;
+            flex-wrap: wrap;
+        }
+
+        .pagination-btn {
+            min-width: 44px;
+            height: 44px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-primary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: 15px;
+            padding: 0 16px;
+        }
+
+        .pagination-btn:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .pagination-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .pagination-dots {
+            color: var(--text-tertiary);
+            padding: 0 12px;
+        }
+
+        /* Footer */
+        .site-footer {
+            background-color: var(--bg-primary);
+            padding: 60px 0 30px;
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 30px;
+        }
+
+        .footer-logo {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            transition: color var(--transition-fast);
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: all var(--transition-fast);
+        }
+
+        .social-links a:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            color: var(--text-tertiary);
+            font-size: 14px;
+            text-align: center;
+            width: 100%;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1100px) {
+            .articles-grid {
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 16px;
+                height: 64px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .page-header {
+                padding: 40px 0 30px;
+            }
+
+            .page-title {
+                font-size: 36px;
+            }
+
+            .page-subtitle {
+                font-size: 16px;
+            }
+
+            .main-container {
+                padding: 30px 16px 50px;
+            }
+
+            .articles-filters {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 16px;
+            }
+
+            .filter-buttons {
+                justify-content: center;
+            }
+
+            .articles-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .article-image {
+                height: 180px;
+            }
+
+            /* No Articles Responsive */
+            .no-articles {
+                padding: 60px 24px;
+                margin: 30px 16px;
+            }
+
+            .no-articles-icon {
+                font-size: 56px;
+            }
+
+            .no-articles-title {
+                font-size: 32px;
+            }
+
+            .no-articles-text {
+                font-size: 16px;
+                margin-bottom: 30px;
+            }
+
+            .browse-btn {
+                padding: 14px 32px;
+                font-size: 15px;
+            }
+
+            /* Newsletter Responsive */
+            .newsletter-section {
+                padding: 60px 30px;
+                margin: 80px 0 60px;
+            }
+
+            .newsletter-icon {
+                font-size: 56px;
+            }
+
+            .newsletter-title {
+                font-size: 36px;
+            }
+
+            .newsletter-text {
+                font-size: 18px;
+                margin-bottom: 40px;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+                padding: 20px;
+                gap: 16px;
+            }
+
+            .newsletter-input {
+                padding: 18px 20px;
+            }
+
+            .newsletter-btn {
+                padding: 18px 20px;
+                width: 100%;
+            }
+
+            .newsletter-benefits {
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title {
+                font-size: 32px;
+            }
+
+            .page-subtitle {
+                font-size: 15px;
+            }
+
+            .article-content {
+                padding: 20px;
+            }
+
+            .article-title {
+                font-size: 20px;
+            }
+
+            .article-excerpt {
+                font-size: 14px;
+                -webkit-line-clamp: 4;
+            }
+
+            .article-image {
+                height: 160px;
+            }
+
+            .filter-buttons {
+                gap: 8px;
+            }
+
+            .filter-btn {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+
+            .pagination-btn {
+                min-width: 36px;
+                height: 36px;
+                padding: 0 12px;
+                font-size: 14px;
+            }
+
+            /* No Articles Mobile */
+            .no-articles {
+                padding: 50px 20px;
+            }
+
+            .no-articles-icon {
+                font-size: 48px;
+            }
+
+            .no-articles-title {
+                font-size: 28px;
+            }
+
+            .no-articles-text {
+                font-size: 15px;
+            }
+
+            .browse-btn {
+                padding: 12px 28px;
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* Newsletter Mobile */
+            .newsletter-section {
+                padding: 50px 24px;
+            }
+
+            .newsletter-icon {
+                font-size: 48px;
+            }
+
+            .newsletter-title {
+                font-size: 32px;
+            }
+
+            .newsletter-text {
+                font-size: 16px;
+            }
+
+            .newsletter-form {
+                padding: 16px;
+            }
+
+            .newsletter-benefits {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text-primary: #ffffff;
+                --text-secondary: #cccccc;
+                --text-tertiary: #999999;
+                --bg-primary: #1a1a1a;
+                --bg-secondary: #121212;
+                --bg-tertiary: #2a2a2a;
+                --border-color: #333333;
+            }
+            
+            /* Override specific colors for dark mode */
+            .article-title,
+            .author-name,
+            .no-articles-title {
+                color: #ffffff;
+            }
+            
+            .article-excerpt,
+            .page-subtitle,
+            .no-articles-text {
+                color: #cccccc;
+            }
+            
+            .article-date {
+                color: #999999;
+            }
+            
+            .no-articles {
+                background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(40, 40, 40, 0.95) 100%);
+                border-color: rgba(124, 45, 18, 0.3);
+                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+            }
+            
+            .no-articles-text {
+                text-shadow: none;
+            }
+
+            .newsletter-section {
+                background: linear-gradient(135deg, #2a1a0f 0%, #1a1007 50%, #0f0803 100%);
+                color: #ffffff;
+            }
+
+            .newsletter-title {
+                color: #ffffff;
+            }
+
+            .newsletter-text {
+                color: rgba(255, 255, 255, 0.9);
+            }
+
+            .newsletter-form {
+                background: rgba(0, 0, 0, 0.2);
+                border-color: rgba(124, 45, 18, 0.3);
+            }
+
+            .newsletter-input {
+                background: rgba(255, 255, 255, 0.1);
+                color: #ffffff;
+            }
+
+            .newsletter-input::placeholder {
+                color: rgba(255, 255, 255, 0.6);
+            }
+
+            .benefit-text {
+                color: rgba(255, 255, 255, 0.9);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <i class="fas fa-bridge"></i>
+                ECAD<span>Bridge</span>
+            </a>
+            <nav class="nav-links">
+                <a href="{% url 'blog:index' %}">Home</a>
+                <a href="{% url 'blog:articles' %}" class="active">Articles</a>
+                <a href="{% url 'blog:posts' %}">Posts</a>
+                <a href="{% url 'blog:about' %}">About</a>
+                <a href="{% url 'blog:contact' %}">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="page-header-content">
+            <h1 class="page-title">Latest Articles</h1>
+            <p class="page-subtitle">Explore in-depth articles, tutorials, and insights from industry experts and thought leaders in technology, design, and development.</p>
+            <div style="text-align: center; margin-top: 20px;">
+                <span class="articles-count">
+                    {% if articles %}
+                        {{ articles|length }} Article{{ articles|pluralize }}
+                    {% else %}
+                        No Articles Yet
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Filters -->
+    
+
+        <!-- Articles Grid -->
+        {% if articles %}
+        <div class="articles-grid">
+            {% for article in articles %}
+            <article class="article-card">
+                <!-- Article Image -->
+                <div class="article-image">
+                    {% if article.cover_image %}
+                    <img src="{{ article.formatted_image_url }}" alt="{{ article.title }}">
+                    {% else %}
+                    <div class="image-placeholder">
+                        <i class="fas fa-newspaper"></i>
+                    </div>
+                    {% endif %}
+                    <span class="article-category">Article</span>
+                </div>
+
+                <!-- Article Content -->
+                <div class="article-content">
+                    <div class="article-header">
+                        <h2 class="article-title">
+                            <a href="{% url 'blog:article_detail' article.slug %}">
+                                {{ article.title }}
+                            </a>
+                        </h2>
+                    </div>
+
+                    <div class="article-meta">
+                        <div class="author-info">
+                            <div class="author-avatar">
+                                {{ article.author.first_name|slice:":1" }}{{ article.author.last_name|slice:":1" }}
+                            </div>
+                            <div class="author-name">
+                                {{ article.author.first_name }} {{ article.author.last_name }}
+                            </div>
+                        </div>
+                        <div class="article-date">
+                            <i class="far fa-calendar"></i>
+                            {{ article.created_at|date:"F d, Y" }}
+                        </div>
+                    </div>
+
+                    <p class="article-excerpt">
+                        {{ article.content|truncatewords:35|striptags }}
+                    </p>
+
+                    <a href="{% url 'blog:article_detail' article.slug %}">
+                        <button class="read-more-btn">
+                            Read More
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- No Articles Message -->
+        <div class="no-articles">
+            <div class="no-articles-content">
+                <div class="no-articles-icon">
+                    <i class="far fa-newspaper"></i>
+                </div>
+                
+                <h2 class="no-articles-title">No Articles Published Yet</h2>
+                
+                <p class="no-articles-text">
+                    We're working diligently to create insightful articles for you. 
+                    Our team is preparing valuable content covering the latest trends in 
+                    technology, design, and development.
+                </p>
+                
+                <a href="/" class="browse-btn">
+                    <i class="fas fa-home"></i>
+                    Browse Homepage
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Newsletter Section -->
+        <div class="newsletter-section">
+            <div class="newsletter-content">
+                <div class="newsletter-icon">
+                    <i class="fas fa-envelope-open-text"></i>
+                </div>
+                
+                <h2 class="newsletter-title">Stay Updated With Our Newsletter</h2>
+                
+                <p class="newsletter-text">
+                    Subscribe to our newsletter and never miss an update. Get exclusive access to 
+                    the latest articles, tutorials, and industry insights delivered directly to your inbox.
+                </p>
+                
+                <form class="newsletter-form" id="newsletterForm">
+                    <input type="email" class="newsletter-input" placeholder="Enter your email address" required>
+                    <button type="submit" class="newsletter-btn">Subscribe Now</button>
+                </form>
+                
+                <div class="newsletter-benefits">
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="fas fa-newspaper"></i>
+                        </div>
+                        <div class="benefit-text">Weekly Updates</div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="benefit-text">No Spam, Ever</div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        <div class="benefit-text">Exclusive Content</div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="benefit-text">Early Access</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        {% if articles|length > 6 %}
+        <div class="pagination">
+            <button class="pagination-btn">
+                <i class="fas fa-chevron-left"></i>
+                Previous
+            </button>
+            <button class="pagination-btn active">1</button>
+            <button class="pagination-btn">2</button>
+            <button class="pagination-btn">3</button>
+            <span class="pagination-dots">...</span>
+            <button class="pagination-btn">8</button>
+            <button class="pagination-btn">
+                Next
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        {% endif %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-bridge"></i>
+                ECAD Bridge
+            </div>
+            <div class="footer-links">
+                <a href="{% url 'blog:index' %}">Home</a>
+                <a href="{% url 'blog:articles' %}">Articles</a>
+                <a href="{% url 'blog:posts' %}">Posts</a>
+                <a href="{% url 'blog:about' %}">About</a>
+                <a href="{% url 'blog:contact' %}">Contact</a>
+                <a href="{% url 'blog:tc' %}">Privacy</a>
+                <a href="{% url 'blog:tc' %}">Terms</a>
+            </div>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+            <div class="copyright">
+                &copy; {% now "Y" %} ECAD Bridge. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Interactive functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Filter buttons
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // In a real implementation, you would filter articles here
+                    console.log(`Filtering articles by: ${this.textContent}`);
+                });
+            });
+            
+            // Sort select
+            const sortSelect = document.querySelector('.sort-select');
+            
+            sortSelect.addEventListener('change', function() {
+                console.log(`Sorting by: ${this.value}`);
+            });
+            
+            // Newsletter form submission
+            const newsletterForm = document.getElementById('newsletterForm');
+            
+            if (newsletterForm) {
+                newsletterForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const emailInput = this.querySelector('.newsletter-input');
+                    const submitBtn = this.querySelector('.newsletter-btn');
+                    const email = emailInput.value.trim();
+                    
+                    if (email) {
+                        // Show loading state
+                        const originalText = submitBtn.textContent;
+                        submitBtn.textContent = 'Subscribing...';
+                        submitBtn.disabled = true;
+                        
+                        // Simulate API call
+                        setTimeout(() => {
+                            // Success message
+                            submitBtn.innerHTML = '<i class="fas fa-check"></i> Subscribed!';
+                            submitBtn.style.background = 'linear-gradient(135deg, #166534, #14532d)';
+                            emailInput.value = '';
+                            
+                            // Show success message
+                            const successMessage = document.createElement('div');
+                            successMessage.style.cssText = `
+                                background: rgba(22, 101, 52, 0.1);
+                                color: var(--success-color);
+                                padding: 12px 20px;
+                                border-radius: 8px;
+                                margin-top: 20px;
+                                font-weight: 500;
+                                border: 1px solid rgba(22, 101, 52, 0.3);
+                            `;
+                            successMessage.textContent = `Thank you! You've been subscribed with: ${email}`;
+                            
+                            // Insert after form
+                            this.parentNode.insertBefore(successMessage, this.nextSibling);
+                            
+                            // Reset button after 3 seconds
+                            setTimeout(() => {
+                                submitBtn.textContent = originalText;
+                                submitBtn.disabled = false;
+                                submitBtn.style.background = 'linear-gradient(135deg, var(--primary-color), var(--primary-dark))';
+                                if (successMessage.parentNode) {
+                                    successMessage.remove();
+                                }
+                            }, 3000);
+                        }, 1500);
+                    }
+                });
+                
+                // Form validation
+                const emailInput = newsletterForm.querySelector('.newsletter-input');
+                
+                emailInput.addEventListener('input', function() {
+                    if (!this.checkValidity()) {
+                        this.style.borderColor = var(--accent-color);
+                    } else {
+                        this.style.borderColor = var(--primary-color);
+                    }
+                });
+            }
+            
+            // Pagination buttons
+            const paginationButtons = document.querySelectorAll('.pagination-btn:not(:first-child):not(:last-child)');
+            
+            paginationButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all pagination buttons
+                    paginationButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // In a real implementation, you would load the corresponding page
+                    console.log(`Loading page: ${this.textContent}`);
+                });
+            });
+            
+            // Add hover effects to article cards
+            const articleCards = document.querySelectorAll('.article-card');
+            
+            articleCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transition = 'all 0.3s ease';
+                });
+                
+                // Add click effect
+                card.addEventListener('click', function(e) {
+                    if (!e.target.closest('.read-more-btn')) {
+                        const link = this.querySelector('.article-title a');
+                        if (link) {
+                            window.location.href = link.href;
+                        }
+                    }
+                });
+            });
+            
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    if (targetId !== '#') {
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+                            window.scrollTo({
+                                top: targetElement.offsetTop - 80,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+            
+            // Add loading animation to articles
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px 50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe all article cards
+            articleCards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>

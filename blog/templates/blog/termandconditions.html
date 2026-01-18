@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms & Privacy | ECAD Bridge</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #7c2d12;       /* Warm burgundy */
+            --primary-dark: #5c220d;        /* Darker burgundy */
+            --primary-light: #fed7aa;       /* Light peach */
+            --secondary-color: #854d0e;     /* Golden brown */
+            --accent-color: #dc2626;        /* Crimson red */
+            --accent-light: #fee2e2;        /* Light red */
+            --text-primary: #1c1917;        /* Rich black */
+            --text-secondary: #57534e;      /* Warm gray */
+            --text-tertiary: #78716c;       /* Lighter warm gray */
+            --bg-primary: #ffffff;          /* White */
+            --bg-secondary: #fafaf9;        /* Stone background */
+            --bg-tertiary: #f5f5f4;         /* Slightly darker stone */
+            --border-color: #d6d3d1;        /* Warm border */
+            --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.05);
+            --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --transition-fast: 150ms ease;
+            --transition-medium: 250ms ease;
+            --font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            color: var(--text-primary);
+            background-color: var(--bg-secondary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .site-header {
+            background-color: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo i {
+            font-size: 22px;
+        }
+
+        .logo span {
+            color: var(--text-primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav-links a {
+            font-weight: 500;
+            transition: all var(--transition-fast);
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+            background-color: var(--primary-light);
+        }
+
+        .nav-links a.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Page Header */
+        .page-header {
+            padding: 60px 0 40px;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(124, 45, 18, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(220, 38, 38, 0.05) 0%, transparent 50%);
+            z-index: 0;
+        }
+
+        .page-header-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .page-title {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .policy-content {
+            padding: 60px 0 80px;
+        }
+
+        .policy-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 60px;
+        }
+
+        @media (min-width: 992px) {
+            .policy-container {
+                grid-template-columns: 300px 1fr;
+                gap: 60px;
+            }
+        }
+
+        /* Table of Contents */
+        .toc-sidebar {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid var(--border-color);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .toc-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toc-title i {
+            color: var(--primary-color);
+        }
+
+        .toc-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toc-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            color: var(--text-secondary);
+            border-radius: var(--radius-md);
+            transition: all var(--transition-fast);
+            font-weight: 500;
+            border-left: 3px solid transparent;
+        }
+
+        .toc-link:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .toc-link.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+        }
+
+        .toc-link i {
+            font-size: 14px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Policy Content */
+        .policy-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
+        }
+
+        .policy-section {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 48px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid var(--border-color);
+            scroll-margin-top: 100px;
+        }
+
+        .section-header {
+            margin-bottom: 40px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .section-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .section-content {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .section-content h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 40px 0 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .section-content h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 32px 0 16px;
+        }
+
+        .section-content p {
+            margin-bottom: 24px;
+        }
+
+        .section-content ul,
+        .section-content ol {
+            margin: 20px 0;
+            padding-left: 32px;
+        }
+
+        .section-content li {
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .section-content ul li::before {
+            content: "•";
+            color: var(--primary-color);
+            font-weight: bold;
+            position: absolute;
+            left: -20px;
+        }
+
+        .section-content ol {
+            counter-reset: item;
+        }
+
+        .section-content ol li {
+            counter-increment: item;
+        }
+
+        .section-content ol li::before {
+            content: counter(item) ".";
+            color: var(--primary-color);
+            font-weight: bold;
+            position: absolute;
+            left: -20px;
+        }
+
+        .highlight-box {
+            background-color: var(--primary-light);
+            border-left: 4px solid var(--primary-color);
+            padding: 24px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            margin: 32px 0;
+        }
+
+        .highlight-box p {
+            margin-bottom: 0;
+            color: var(--primary-dark);
+            font-weight: 500;
+        }
+
+        .contact-info {
+            background-color: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            margin: 32px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .contact-info h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contact-info h4 i {
+            color: var(--primary-color);
+        }
+
+        .contact-details {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-secondary);
+        }
+
+        .contact-item i {
+            color: var(--primary-color);
+            width: 20px;
+        }
+
+        .last-updated {
+            display: inline-block;
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        /* Back to Top */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: var(--shadow-medium);
+            transition: all var(--transition-fast);
+            z-index: 100;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Footer */
+        .site-footer {
+            background-color: var(--bg-primary);
+            padding: 60px 0 30px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 30px;
+        }
+
+        .footer-logo {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            transition: color var(--transition-fast);
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: all var(--transition-fast);
+        }
+
+        .social-links a:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            color: var(--text-tertiary);
+            font-size: 14px;
+            text-align: center;
+            width: 100%;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 991px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .page-title {
+                font-size: 36px;
+            }
+            
+            .policy-section {
+                padding: 40px 32px;
+            }
+            
+            .section-title {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 16px;
+                height: 64px;
+            }
+
+            .page-header {
+                padding: 40px 0 30px;
+            }
+
+            .page-title {
+                font-size: 32px;
+            }
+
+            .page-subtitle {
+                font-size: 16px;
+            }
+
+            .policy-content {
+                padding: 40px 0 60px;
+            }
+
+            .policy-container {
+                gap: 40px;
+            }
+
+            .toc-sidebar {
+                padding: 24px;
+            }
+
+            .policy-section {
+                padding: 32px 24px;
+            }
+
+            .section-title {
+                font-size: 26px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 16px;
+            }
+            
+            .page-title {
+                font-size: 28px;
+            }
+            
+            .policy-section {
+                padding: 28px 20px;
+            }
+            
+            .section-title {
+                font-size: 24px;
+            }
+            
+            .footer-links {
+                gap: 16px;
+            }
+            
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 44px;
+                height: 44px;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text-primary: #e6e6e6;
+                --text-secondary: #b3b3b3;
+                --text-tertiary: #8c8c8c;
+                --bg-primary: #1a1a1a;
+                --bg-secondary: #121212;
+                --bg-tertiary: #2a2a2a;
+                --border-color: #404040;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <i class="fas fa-bridge"></i>
+                ECAD<span>Bridge</span>
+            </a>
+            <nav class="nav-links">
+                <a href="{% url 'blog:index' %}">Home</a>
+                <a href="{% url 'blog:articles' %}">Articles</a>
+                <a href="{% url 'blog:posts' %}">Posts</a>
+                <a href="{% url 'blog:about' %}">About</a>
+                <a href="{% url 'blog:contact' %}">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <div class="page-header-content">
+                <h1 class="page-title">Legal Policies</h1>
+                <p class="page-subtitle">Transparent governance framework for data sovereignty, privacy protection, and user rights.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="policy-content">
+        <div class="container">
+            <div class="policy-container">
+                <!-- Table of Contents -->
+                <aside class="toc-sidebar">
+                    <h2 class="toc-title">
+                        <i class="fas fa-bookmark"></i>
+                        Quick Navigation
+                    </h2>
+                    <nav class="toc-nav">
+                        <a href="#privacy-policy" class="toc-link active" onclick="scrollToSection('privacy-policy')">
+                            <i class="fas fa-shield-alt"></i>
+                            Privacy Policy
+                        </a>
+                        <a href="#terms-conditions" class="toc-link" onclick="scrollToSection('terms-conditions')">
+                            <i class="fas fa-file-contract"></i>
+                            Terms & Conditions
+                        </a>
+                        <a href="#contact-info" class="toc-link" onclick="scrollToSection('contact-info')">
+                            <i class="fas fa-envelope"></i>
+                            Contact Information
+                        </a>
+                        <a href="#policy-updates" class="toc-link" onclick="scrollToSection('policy-updates')">
+                            <i class="fas fa-sync-alt"></i>
+                            Policy Updates
+                        </a>
+                    </nav>
+                </aside>
+
+                <!-- Policy Sections -->
+                <div class="policy-sections">
+                    <!-- Privacy Policy -->
+                    <section id="privacy-policy" class="policy-section">
+                        <div class="section-header">
+                            <h1 class="section-title">Privacy & Data Sovereignty Policy</h1>
+                            <p class="section-subtitle">
+                                Last Updated: December 31, 2025
+                                <span class="last-updated">Current Version</span>
+                            </p>
+                        </div>
+                        
+                        <div class="section-content">
+                            <div class="highlight-box">
+                                <p>At The ECAD Bridge, we believe transparency is a fundamental truth. We are committed to the ethical stewardship of the data you entrust to us, ensuring that your professional privacy is maintained while providing the highest level of technical insight.</p>
+                            </div>
+
+                            <h2>1. Data Synthesis (What we collect)</h2>
+                            <p>To facilitate our mission of technical excellence, we aggregate the following information:</p>
+                            <ul>
+                                <li><strong>Professional Identity:</strong> Your name, corporate affiliation, and electronic contact credentials.</li>
+                                <li><strong>Digital Interaction:</strong> Metadata regarding your activity within our digital ecosystem.</li>
+                                <li><strong>Assessment Intelligence:</strong> Specific data points and choices made within our Assessment Center to generate your technical profiles.</li>
+                            </ul>
+
+                            <h2>2. Acquisition of Information (How we collect it)</h2>
+                            <p>We collect data through direct engagement and transparent interaction. You provide this information when you:</p>
+                            <ul>
+                                <li>Enroll in our global research initiatives.</li>
+                                <li>Engage with our Assessment Center for professional benchmarking.</li>
+                                <li>Register for access to our exclusive technical frameworks.</li>
+                            </ul>
+
+                            <h2>3. Strategic Use of Data</h2>
+                            <p>The ECAD Bridge utilizes your information to:</p>
+                            <ul>
+                                <li>Orchestrate specialized communications, including research findings and survey invitations.</li>
+                                <li>Personalize your journey through the Assessment Center to ensure maximum efficacy.</li>
+                                <li><strong>Facilitate Industry Connections:</strong> With your explicit consent, we may share insights with Assessment Center Sponsors to provide you with access to advanced tools and services. You maintain the right to opt-out of these communications at any time.</li>
+                            </ul>
+
+                            <h2>4. Data Stewardship & Retention</h2>
+                            <p>Your information is securely sequestered within our HubSpot management environment. To maintain the integrity of our historical research and longitudinal studies, The ECAD Bridge retains professional and activity data indefinitely, or until a request for erasure is invoked.</p>
+
+                            <h2>5. Your Data Sovereignty (Rights)</h2>
+                            <p>In alignment with global privacy standards, every member of our ecosystem is entitled to:</p>
+                            <ul>
+                                <li><strong>The Right to Access:</strong> Requesting a comprehensive record of your personal data.</li>
+                                <li><strong>The Right to Rectification:</strong> Ensuring all professional information is accurate and complete.</li>
+                                <li><strong>The Right to Erasure:</strong> Requesting the deletion of your data under specific conditions.</li>
+                                <li><strong>The Right to Restriction & Objection:</strong> Managing how and why your data is processed.</li>
+                                <li><strong>The Right to Portability:</strong> Transferring your data assets to other organizations or yourself.</li>
+                            </ul>
+                            <p><strong>Note:</strong> We respond to all governance requests within one calendar month. Contact us at ecadbridge@outlook.com to exercise these rights.</p>
+
+                            <h2>6. Digital Identifiers (Cookies)</h2>
+                            <p>We utilize cookies—small digital signatures—to optimize site architecture and recognize your preferences. These allow us to:</p>
+                            <ul>
+                                <li>Analyze usage patterns to improve the Assessment Center experience.</li>
+                                <li>Maintain your functional preferences (such as language and localization).</li>
+                            </ul>
+                            <p>You may disable cookies via your browser settings, though some advanced site capabilities may be diminished.</p>
+
+                            <h2>7. Jurisdictional Scope</h2>
+                            <p>Our policy applies exclusively to The ECAD Bridge. While our platform may contain links to external partners, we encourage you to review their respective policies upon departure from our site.</p>
+
+                            <h2>8. Governance Contact</h2>
+                            <p>For inquiries regarding our privacy standards or data integrity, please contact our administration:</p>
+                            <div class="contact-info">
+                                <h4><i class="fas fa-envelope"></i> Email</h4>
+                                <div class="contact-details">
+                                    <div class="contact-item">
+                                        <i class="fas fa-inbox"></i>
+                                        ecadbridge@outlook.com
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Terms & Conditions -->
+                    <section id="terms-conditions" class="policy-section">
+                        <div class="section-header">
+                            <h1 class="section-title">Terms & Conditions of Use</h1>
+                            <p class="section-subtitle">
+                                Last Updated: December 31, 2025
+                                <span class="last-updated">Current Version</span>
+                            </p>
+                        </div>
+                        
+                        <div class="section-content">
+                            <div class="highlight-box">
+                                <p>Welcome to The ECAD Bridge. By accessing and using our platform, you agree to be bound by these Terms & Conditions. Please read them carefully before proceeding.</p>
+                            </div>
+
+                            <h2>1. Acceptance of Terms</h2>
+                            <p>By accessing and using The ECAD Bridge website and services, you acknowledge that you have read, understood, and agree to be bound by these Terms & Conditions. If you do not agree with any part of these terms, you must discontinue use of our services immediately.</p>
+
+                            <h2>2. User Eligibility</h2>
+                            <p>You must be at least 18 years of age to use our services. By using our platform, you represent and warrant that you are of legal age and have the right, authority, and capacity to enter into these Terms.</p>
+
+                            <h2>3. Account Registration</h2>
+                            <p>To access certain features of our platform, you may be required to register for an account. You agree to:</p>
+                            <ul>
+                                <li>Provide accurate, current, and complete information during registration</li>
+                                <li>Maintain and promptly update your account information</li>
+                                <li>Maintain the security of your account credentials</li>
+                                <li>Accept responsibility for all activities that occur under your account</li>
+                                <li>Notify us immediately of any unauthorized use of your account</li>
+                            </ul>
+
+                            <h2>4. Intellectual Property Rights</h2>
+                            <p>All content, features, and functionality on The ECAD Bridge platform, including but not limited to text, graphics, logos, images, assessments, frameworks, and software, are the exclusive property of The ECAD Bridge and are protected by international copyright, trademark, and other intellectual property laws.</p>
+                            <p>You may not reproduce, distribute, modify, create derivative works of, publicly display, publicly perform, republish, download, store, or transmit any of our proprietary material without our express written permission.</p>
+
+                            <h2>5. User Conduct</h2>
+                            <p>You agree not to use our platform to:</p>
+                            <ul>
+                                <li>Violate any applicable laws or regulations</li>
+                                <li>Infringe upon the intellectual property rights of others</li>
+                                <li>Upload or transmit any material that is defamatory, obscene, or offensive</li>
+                                <li>Attempt to gain unauthorized access to our systems or other users' accounts</li>
+                                <li>Interfere with or disrupt the integrity or performance of our platform</li>
+                                <li>Collect or harvest any information from our platform without authorization</li>
+                            </ul>
+
+                            <h2>6. Assessment Center Terms</h2>
+                            <p>Participation in our Assessment Center is subject to the following conditions:</p>
+                            <ul>
+                                <li>All assessment responses must be your own work</li>
+                                <li>Assessment results are for professional development purposes only</li>
+                                <li>We reserve the right to invalidate assessments that appear fraudulent or inaccurate</li>
+                                <li>Benchmarking data is aggregated and anonymized for research purposes</li>
+                            </ul>
+
+                            <h2>7. Limitation of Liability</h2>
+                            <p>The ECAD Bridge shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use or inability to use our services, including but not limited to loss of profits, data, or business opportunities.</p>
+
+                            <h2>8. Termination</h2>
+                            <p>We reserve the right to terminate or suspend your account and access to our services at our sole discretion, without notice, for conduct that we believe violates these Terms or is harmful to other users, us, or third parties.</p>
+
+                            <h2>9. Governing Law</h2>
+                            <p>These Terms shall be governed by and construed in accordance with the laws of the jurisdiction in which The ECAD Bridge is established, without regard to its conflict of law provisions.</p>
+
+                            <h2>10. Changes to Terms</h2>
+                            <p>We reserve the right to modify these Terms at any time. We will notify users of significant changes through our platform or via email. Your continued use of our services after such modifications constitutes acceptance of the updated Terms.</p>
+                        </div>
+                    </section>
+
+                    <!-- Contact Information -->
+                    <section id="contact-info" class="policy-section">
+                        <div class="section-header">
+                            <h1 class="section-title">Contact & Governance</h1>
+                            <p class="section-subtitle">How to reach us for policy inquiries and legal matters</p>
+                        </div>
+                        
+                        <div class="section-content">
+                            <h2>Legal Inquiries</h2>
+                            <p>For all legal matters, policy clarifications, and data protection requests:</p>
+                            <div class="contact-info">
+                                <h4><i class="fas fa-balance-scale"></i> Legal Department</h4>
+                                <div class="contact-details">
+                                    <div class="contact-item">
+                                        <i class="fas fa-envelope"></i>
+                                        ecadbridge@outlook.com
+                                    </div>
+                                    <div class="contact-item">
+                                        <i class="fas fa-clock"></i>
+                                        Response Time: Within 30 days
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h2>Data Protection Officer</h2>
+                            <p>For matters specifically related to data privacy, GDPR compliance, and data subject rights:</p>
+                            <div class="contact-info">
+                                <h4><i class="fas fa-user-shield"></i> Data Protection Contact</h4>
+                                <div class="contact-details">
+                                    <div class="contact-item">
+                                        <i class="fas fa-inbox"></i>
+                                        ecadbridge@outlook.com
+                                    </div>
+                                    <div class="contact-item">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        Subject Line: "Data Protection Inquiry"
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h2>Hours of Operation</h2>
+                            <p>Our administrative team typically responds to inquiries within standard business hours (9:00 AM - 5:00 PM IST, Monday through Friday, excluding public holidays). Urgent matters receive priority attention.</p>
+
+                        
+                        </div>
+                    </section>
+
+                    <!-- Policy Updates -->
+                    <section id="policy-updates" class="policy-section">
+                        <div class="section-header">
+                            <h1 class="section-title">Policy Updates & Version Control</h1>
+                            <p class="section-subtitle">Tracking changes and maintaining transparency</p>
+                        </div>
+                        
+                        <div class="section-content">
+                            <h2>Version History</h2>
+                            <p>We maintain a comprehensive record of all policy changes to ensure transparency and accountability:</p>
+                            
+                            <h3>Current Version: v2.3 (December 31, 2025)</h3>
+                            <ul>
+                                <li>Updated data retention policies to align with global standards</li>
+                                <li>Enhanced user rights section with clearer opt-out procedures</li>
+                                <li>Expanded cookie policy details</li>
+                                <li>Improved contact information structure</li>
+                            </ul>
+
+                            
+
+                            <h2>Update Notification Process</h2>
+                            <p>When we make significant changes to our policies:</p>
+                            <ul>
+                                <li>We update the "Last Updated" date at the top of each policy section</li>
+                                <li>We notify registered users via email 30 days before changes take effect</li>
+                                <li>We maintain a version history for transparency</li>
+                                <li>We provide a summary of changes for user convenience</li>
+                            </ul>
+
+                            <h2>Your Responsibility</h2>
+                            <p>It is your responsibility to review these policies periodically. Your continued use of our platform following the posting of changes constitutes acceptance of those changes.</p>
+
+                            <div class="highlight-box">
+                                <p><strong>Important:</strong> The most current version of our policies always supersedes all previous versions. Archived versions are available upon request for compliance verification purposes.</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Back to Top -->
+    <a href="#" class="back-to-top" id="backToTop">
+        <i class="fas fa-chevron-up"></i>
+    </a>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-bridge"></i>
+                    ECAD Bridge
+                </div>
+                <div class="footer-links">
+                    <a href="{% url 'blog:index' %}">Home</a>
+                    <a href="{% url 'blog:articles' %}">Articles</a>
+                    <a href="{% url 'blog:posts' %}">Posts</a>
+                    <a href="{% url 'blog:about' %}">About</a>
+                    <a href="{% url 'blog:contact' %}">Contact</a>
+                    <a href="#" class="active">Privacy & Terms</a>
+                </div>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+                <div class="copyright">
+                    &copy; {% now "Y" %} ECAD Bridge. All rights reserved.<br>
+                    <small>Last updated: December 31, 2025</small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Table of Contents navigation
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                const headerOffset = 80;
+                const elementPosition = section.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+
+                // Update active state in TOC
+                document.querySelectorAll('.toc-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                event.currentTarget.classList.add('active');
+            }
+        }
+
+        // Back to Top button
+        const backToTop = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        backToTop.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Active section detection
+        const sections = document.querySelectorAll('.policy-section');
+        const navLinks = document.querySelectorAll('.toc-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= (sectionTop - 100)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Smooth scrolling for all anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId !== '#') {
+                    scrollToSection(targetId.substring(1));
+                }
+            });
+        });
+
+        // Print functionality
+        const printButton = document.createElement('button');
+        printButton.innerHTML = '<i class="fas fa-print"></i> Print Policies';
+        printButton.style.cssText = `
+            position: fixed;
+            bottom: 90px;
+            right: 30px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            box-shadow: var(--shadow-medium);
+            z-index: 100;
+            transition: all var(--transition-fast);
+        `;
+
+        printButton.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = 'var(--shadow-heavy)';
+        });
+
+        printButton.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'var(--shadow-medium)';
+        });
+
+        printButton.addEventListener('click', function() {
+            window.print();
+        });
+
+        document.body.appendChild(printButton);
+
+        // Adjust print button position on scroll
+        window.addEventListener('scroll', function() {
+            printButton.style.bottom = (90 + window.scrollY) + 'px';
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set first TOC link as active
+            document.querySelector('.toc-link').classList.add('active');
+        });
+    </script>
+</body>
+</html>
