@@ -21,7 +21,7 @@ urlpatterns = [
     path('admin_base/content/edit/<int:pk>/', views.admin_edit_content, name='admin_edit_content'),
     path('admin_base/content/delete/<int:pk>/', views.admin_delete_content, name='admin_delete_content'),
     path('api/content/<int:content_id>/analytics/', views.get_content_analytics, name='content_analytics'),
-    path("login/", views.login_view, name="login"),
+    # path("login/", views.login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
     
     ]

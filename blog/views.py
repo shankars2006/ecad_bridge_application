@@ -792,13 +792,13 @@ def admin_delete_content(request, pk):
     return redirect('blog:admin_content_list')
 
 
-def login_view(request):
+# def login_view(request):
     
-    if request.user.is_authenticated:
-        return redirect("blog:index")
+#     if request.user.is_authenticated:
+#         return redirect("blog:index")
 
-    return render(request, "blog/login.html")
+#     return render(request, "blog/login.html")
 
 def logout_view(request):
     logout(request)
-    return redirect("blog:login")
+    return redirect("blog:index")

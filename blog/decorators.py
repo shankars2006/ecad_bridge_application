@@ -6,11 +6,6 @@ from django.core.exceptions import PermissionDenied
 
 
 def admin_required(view_func):
-    """
-    Allows access only to logged-in staff users.
-    Redirects unauthenticated users to login page.
-    Raises 403 for non-admin logged-in users.
-    """
 
     @login_required(login_url='/login/')
     @wraps(view_func)
