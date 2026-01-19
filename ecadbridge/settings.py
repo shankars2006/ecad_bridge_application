@@ -101,7 +101,7 @@ SOCIALACCOUNT_LOGIN_ON_GET = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ecadbridge',
+        'NAME': 'ecadbridge_db',
         'USER': 'ecadbridge_admin',
         'PASSWORD': 'MG1BdaZbHPJcwZxUaSmX',
         'HOST': 'ecadbridge.cze6ayuqexpw.eu-north-1.rds.amazonaws.com',
