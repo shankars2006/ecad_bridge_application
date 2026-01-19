@@ -102,9 +102,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ecadbridge',
-        'USER': 'root',
-        'PASSWORD': 'shankar@developer',
-        'HOST': 'localhost',
+        'USER': 'ecadbridge_admin',
+        'PASSWORD': 'MG1BdaZbHPJcwZxUaSmX',
+        'HOST': 'ecadbridge.cze6ayuqexpw.eu-north-1.rds.amazonaws.com',
         'PORT': '3306',
     }
 }
