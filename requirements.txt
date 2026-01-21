@@ -19,3 +19,4 @@ requests==2.32.5
 python-dotenv
 cryptography
 PyJWT>=2.8.0
+python-jose[cryptography]
