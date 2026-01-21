@@ -45,6 +45,7 @@ SITE_ID = 1
 # --------------------------------------------------
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -84,20 +85,33 @@ TEMPLATES = [
 # --------------------------------------------------
 # DATABASE (RAILWAY MYSQL SAFE)
 # --------------------------------------------------
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': os.getenv("DB_NAME"),
+#         'USER': os.getenv("DB_USER"),
+#         'PASSWORD': os.getenv("DB_PASSWORD"),
+#         'HOST': os.getenv("DB_HOST"),
+#         'PORT': os.getenv("DB_PORT", "3306"),
+#         'OPTIONS': {
+#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+#         },
+#     }
+# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv("DB_NAME"),
-        'USER': os.getenv("DB_USER"),
-        'PASSWORD': os.getenv("DB_PASSWORD"),
-        'HOST': os.getenv("DB_HOST"),
-        'PORT': os.getenv("DB_PORT", "3306"),
+        'NAME': os.getenv("MYSQL_DATABASE", ""),
+        'USER': os.getenv("MYSQL_USER", ""),
+        'PASSWORD': os.getenv("MYSQL_PASSWORD", ""),
+        'HOST': os.getenv("MYSQL_HOST", "127.0.0.1"),  # Default prevents the NoneType crash
+        'PORT': os.getenv("MYSQL_PORT", "3306"),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'charset': 'utf8mb4',
         },
     }
 }
-
 # --------------------------------------------------
 # AUTHENTICATION
 # --------------------------------------------------
@@ -172,3 +186,5 @@ LOGGING = {
         "level": "INFO",
     },
 }
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
