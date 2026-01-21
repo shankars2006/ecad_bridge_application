@@ -1,6 +1,9 @@
 Django==5.1.7
-python_jose==3.5.0
+python-dotenv==1.2.1
+python-jose==3.5.0
 requests==2.32.5
 Pillow
-django-tinymce4==3.7.1
+django-tinymce4
 mysqlclient
+django-allauth
+djangorestframework
