@@ -101,7 +101,7 @@ TEMPLATES = [
 DB_NAME = os.getenv("MYSQL_DATABASE") or os.getenv("MYSQLDATABASE")
 DB_USER = os.getenv("MYSQL_USER") or os.getenv("MYSQLUSER")
 DB_PASSWORD = os.getenv("MYSQL_PASSWORD") or os.getenv("MYSQLPASSWORD")
-DB_HOST = os.getenv("MYSQL_HOST") or os.getenv("MYSQLHOST") or "127.0.0.1"
+DB_HOST = os.getenv("MYSQL_HOST") or os.getenv("MYSQLHOST") or "127.0.0.1" or "mysql.railway.internal"
 DB_PORT = os.getenv("MYSQL_PORT") or os.getenv("MYSQLPORT") or "3306"
 
 DATABASES = {
