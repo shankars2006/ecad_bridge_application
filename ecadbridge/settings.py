@@ -98,14 +98,20 @@ TEMPLATES = [
 #         },
 #     }
 # }
+DB_NAME = os.getenv("MYSQL_DATABASE") or os.getenv("MYSQLDATABASE")
+DB_USER = os.getenv("MYSQL_USER") or os.getenv("MYSQLUSER")
+DB_PASSWORD = os.getenv("MYSQL_PASSWORD") or os.getenv("MYSQLPASSWORD")
+DB_HOST = os.getenv("MYSQL_HOST") or os.getenv("MYSQLHOST") or "127.0.0.1"
+DB_PORT = os.getenv("MYSQL_PORT") or os.getenv("MYSQLPORT") or "3306"
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv("MYSQL_DATABASE"),
-        'USER': os.getenv("MYSQL_USER"),
-        'PASSWORD': os.getenv("MYSQL_PASSWORD"),
-        'HOST': os.getenv("MYSQL_HOST"),
-        'PORT': os.getenv("MYSQL_PORT"),
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'charset': 'utf8mb4',
@@ -155,7 +161,9 @@ USE_TZ = True
 # STATIC FILES
 # --------------------------------------------------
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 STATICFILES_DIRS = [
     BASE_DIR / 'blog' / 'static',
