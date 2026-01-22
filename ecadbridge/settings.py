@@ -21,6 +21,7 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
 # APPLICATIONS
 # --------------------------------------------------
 INSTALLED_APPS = [
+    'django.contrib.sites'
     'rest_framework',
 
     'django.contrib.admin',
