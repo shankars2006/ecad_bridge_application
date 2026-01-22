@@ -98,20 +98,20 @@ TEMPLATES = [
 #         },
 #     }
 # }
-DB_NAME = os.getenv("MYSQL_DATABASE") or os.getenv("MYSQLDATABASE")
-DB_USER = os.getenv("MYSQL_USER") or os.getenv("MYSQLUSER")
-DB_PASSWORD = os.getenv("MYSQL_PASSWORD") or os.getenv("MYSQLPASSWORD")
-DB_HOST = os.getenv("MYSQL_HOST") or os.getenv("MYSQLHOST") or "mysql.railway.internal"
-DB_PORT = os.getenv("MYSQL_PORT") or os.getenv("MYSQLPORT") or "3306"
+# DB_NAME = os.getenv("MYSQL_DATABASE") or os.getenv("MYSQLDATABASE")
+# DB_USER = os.getenv("MYSQL_USER") or os.getenv("MYSQLUSER")
+# DB_PASSWORD = os.getenv("MYSQL_PASSWORD") or os.getenv("MYSQLPASSWORD")
+# DB_HOST = os.getenv("MYSQL_HOST") or os.getenv("MYSQLHOST") or "mysql.railway.internal"
+# DB_PORT = os.getenv("MYSQL_PORT") or os.getenv("MYSQLPORT") or "3306"
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': DB_NAME,
-        'USER': DB_USER,
-        'PASSWORD': DB_PASSWORD,
-        'HOST': DB_HOST,
-        'PORT': DB_PORT,
+        'NAME': 'railway',
+        'USER': 'root',
+        'PASSWORD': 'xEnzhdqRtOovJxIuKPOLPTarTcBAbECC',
+        'HOST': 'mysql.railway.internal',
+        'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'charset': 'utf8mb4',
