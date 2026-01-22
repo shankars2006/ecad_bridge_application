@@ -3,7 +3,7 @@ Django==5.1.7
 django-allauth
 djangorestframework
 django-tinymce4
-
+gunicorn
 mysqlclient
 Pillow
 requests==2.32.5
