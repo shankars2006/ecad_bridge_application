@@ -1,0 +1,24 @@
+﻿name: Create Railway superuser
+on:
+  workflow_dispatch:
+
+jobs:
+  create-superuser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: curl -sSL https://railway.app/install.sh | sh
+
+      - name: Login to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: railway login --token "$RAILWAY_TOKEN"
+
+      - name: Run create superuser command on Railway
+        env:
+          SUPERUSER_USERNAME: ${{ secrets.SUPERUSER_USERNAME }}
+          SUPERUSER_EMAIL: ${{ secrets.SUPERUSER_EMAIL }}
+          SUPERUSER_PASSWORD: ${{ secrets.SUPERUSER_PASSWORD }}
+        run: railway run --service ecad_bridge_application python manage.py create_initial_superuser
