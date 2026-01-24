@@ -1,5 +1,7 @@
 import os
 from pathlib import Path
+import dj_database_url
+
 
 # Load .env only in local development (optional)
 if os.getenv("DJANGO_DEVELOPMENT", "False") == "True":
@@ -74,21 +76,24 @@ TEMPLATES = [
     },
 ]
 
-# DATABASE (use env vars; do NOT hardcode credentials)
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": os.getenv("DB_NAME", os.getenv("MYSQL_DATABASE", "railway")),
-        "USER": os.getenv("DB_USER", os.getenv("MYSQL_USER", "root")),
-        "PASSWORD": os.getenv("DB_PASSWORD", os.getenv("MYSQL_PASSWORD", "")),
-        "HOST": os.getenv("DB_HOST", os.getenv("MYSQL_HOST", "mysql.railway.internal")),
-        "PORT": os.getenv("DB_PORT", os.getenv("MYSQL_PORT", "3306")),
-        "OPTIONS": {
-            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
-            "charset": "utf8mb4",
-        },
-    }
+    "default": dj_database_url.config(
+        default=os.getenv(
+            "DATABASE_URL",
+            # fallback to explicit fields if DATABASE_URL not provided
+            "postgres://{user}:{password}@{host}:{port}/{name}".format(
+                user=os.getenv("DB_USER", "postgres"),
+                password=os.getenv("DB_PASSWORD", ""),
+                host=os.getenv("DB_HOST", "localhost"),
+                port=os.getenv("DB_PORT", "5432"),
+                name=os.getenv("DB_NAME", "postgres"),
+            ),
+        ),
+        conn_max_age=int(os.getenv("DB_CONN_MAX_AGE", 600)),
+        ssl_require=os.getenv("DB_SSL", "False").lower() in ("true", "1", "yes"),
+    )
 }
+
 
 TINYMCE_DEFAULT_CONFIG = {
     "height": 360,
